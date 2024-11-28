@@ -63,7 +63,8 @@ return [
     'home_link' => '',
 
     // Menu logo. You can replace this with an <img> tag if you have a logo.
-    'project_logo' => '<b>Back</b>pack',
+    // 'project_logo' => '<b>Back</b>pack',
+    'project_logo' => '<span class="wpvite_logo"><span class="wp">wp</span><span class="brackets">&lt;</span><span class="vite">vite</span><span class="brackets">&gt;</span></span>',
 
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => true,
@@ -79,7 +80,7 @@ return [
     'developer_link' => 'http://tabacitu.ro',
 
     // Show powered by Laravel Backpack in the footer? true/false
-    'show_powered_by' => true,
+    'show_powered_by' => false,
 
     // ---------
     // DASHBOARD
@@ -107,6 +108,7 @@ return [
     // Please note that support for Vite was added in Laravel 9.19. Earlier versions are not able to use this feature.
     'vite_styles' => [ // resource file_path
         // 'resources/css/app.css',
+        'resources/css/common.css',
     ],
 
     // --------------
