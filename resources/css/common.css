@@ -8,17 +8,20 @@
 }
 
 .wpvite_logo .wp {
-    color: #0073AA;
+    /* color: #0073AA; */
+    color: #005A8D;
     /* WordPress Blue */
 }
 
 .wpvite_logo .brackets {
-    color: #1DB954;
+    /* color: #1DB954; */
+    color: #19A547;
     /* Green for growth and innovation */
 }
 
 .wpvite_logo .vite {
-    background: linear-gradient(90deg, #1DB954, #00C9A7);
+    /* background: linear-gradient(90deg, #1DB954, #00C9A7); */
+    background: linear-gradient(90deg, #0baa44, #02b99a);
     /* Gradient for "vite" */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -27,5 +30,8 @@
 }
 
 .navbar-brand .wpvite_logo {
-    font-size: 2.2rem;
+    font-size: 2rem;
+}
+.navbar-brand img.wpvite_logo {
+    width: 180px;
 }

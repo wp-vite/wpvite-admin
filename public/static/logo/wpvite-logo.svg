@@ -1,14 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="500" height="150" viewBox="0 0 500 150">
-  <text x="20" y="80" font-family="Poppins, sans-serif" font-size="50" font-weight="700" fill="#0073AA">wp</text>
-  <text x="90" y="80" font-family="Poppins, sans-serif" font-size="50" font-weight="700" fill="#1DB954">&lt;</text>
-  <text x="125" y="80" font-family="Poppins, sans-serif" font-size="50" font-weight="700" fill="url(#gradient)" font-style="italic">vite</text>
-  <text x="220" y="80" font-family="Poppins, sans-serif" font-size="50" font-weight="700" fill="#1DB954">&gt;</text>
-  <!-- <text x="280" y="80" font-family="Poppins, sans-serif" font-size="50" font-weight="700" fill="#FF7F50">.</text> -->
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="81.3" viewBox="0 0 500 81.3">
+    <text x="2.08" y="78" font-family="Poppins, sans-serif" font-size="106" font-weight="700" fill="#005A8D">WP</text>
+    <text x="179" y="78" font-family="Poppins, sans-serif" font-size="106" font-weight="700" fill="#19A547">&lt;</text>
+    <text x="241" y="78" font-family="Poppins, sans-serif" font-size="106" font-weight="700" fill="url(#gradient)" font-style="italic">Vite</text>
+    <text x="438" y="78" font-family="Poppins, sans-serif" font-size="106" font-weight="700" fill="#19A547">&gt;</text>
 
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#1DB954" />
-      <stop offset="100%" stop-color="#00C9A7" />
-    </linearGradient>
-  </defs>
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0BAA44" />
+            <stop offset="100%" stop-color="#02B99A" />
+        </linearGradient>
+    </defs>
 </svg>

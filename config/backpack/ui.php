@@ -64,7 +64,8 @@ return [
 
     // Menu logo. You can replace this with an <img> tag if you have a logo.
     // 'project_logo' => '<b>Back</b>pack',
-    'project_logo' => '<span class="wpvite_logo"><span class="wp">wp</span><span class="brackets">&lt;</span><span class="vite">vite</span><span class="brackets">&gt;</span></span>',
+    // 'project_logo' => '<span class="wpvite_logo"><span class="wp">WP</span><span class="brackets">&lt;</span><span class="vite">Vite</span><span class="brackets">&gt;</span></span>',
+    'project_logo' => '<img src="'.asset('static/logo/wpvite-logo.png').'" alt="WP<Vite>" class="wpvite_logo">',
 
     // Show / hide breadcrumbs on admin panel pages.
     'breadcrumbs' => true,

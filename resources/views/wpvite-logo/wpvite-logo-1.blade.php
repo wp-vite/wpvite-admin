@@ -3,49 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>wpvite Logo</title>
+  <title>wpvite Logo - Tech-Focused</title>
   <style>
     body {
       font-family: 'Poppins', sans-serif;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: #f4f4f4;
+      background-color: #f4f4f4; /* Dark background for a tech vibe */
     }
 
-    .logo {
-      font-size: 3rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-    }
-
-    .logo .wp {
-      color: #0073AA; /* WordPress Blue */
-    }
-
-    .logo .vite {
-      background: linear-gradient(90deg, #1DB954, #00C9A7); /* Green Gradient */
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .logo .vite {
-      font-style: italic;
-    }
-
-    .dot {
-      color: #FF7F50; /* Orange accent */
-      font-size: 2rem;
+    .logo-container {
+        font-size: 3.2rem;
     }
   </style>
+
+@vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/common.css'])
 </head>
 <body>
-  <div class="logo">
-    <span class="wp">wp</span><span class="vite">vite</span><span class="dot">.</span>
-  </div>
+
+    <div class="logo-svg">
+        {{-- <!-- Example HTML --> --}}
+        <img src="{{ asset('static/logo/wpvite-icon.svg') }}" alt="wpvite Logo Dark" class="logo dark-theme">
+    </div>
+
+    <div class="logo-container">
+        <div class="wpvite_logo">
+            <span class="wp">WP</span>
+            <span class="brackets">&lt;</span>
+            <span class="vite">Vite</span>
+            <span class="brackets">&gt;</span>
+        </div>
+    </div>
+
+    <div class="logo-svg">
+        {{-- <!-- Example HTML --> --}}
+        <img src="{{ asset('static/logo/wpvite-logo.svg') }}" alt="wpvite Logo Dark" class="logo dark-theme">
+    </div>
 </body>
 </html>
