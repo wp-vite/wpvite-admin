@@ -18,9 +18,9 @@ return new class extends Migration
             $table->foreignId('template_id')->constrained('templates', 'template_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
             $table->string('domain')->unique();
-            $table->unsignedTinyInteger('status'); // 1 => Active, 2 => Inactive, 3 => Suspended
-            $table->softDeletes()->index();
+            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 3 => Suspended
             $table->timestamps();
+            $table->softDeletes()->index();
 
             $table->index('status');
         });

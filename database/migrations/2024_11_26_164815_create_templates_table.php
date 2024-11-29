@@ -17,9 +17,10 @@ return new class extends Migration
             $table->string('title', 100);
             $table->text('description');
             $table->foreignId('category_id')->constrained('template_categories', 'category_id');
-            $table->unsignedTinyInteger('status'); // 1 => Active, 2 => Inactive
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
+            $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('status');
         });
