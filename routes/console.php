@@ -9,5 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Artisan::command('hello', function () {
-    $this->info(CustomHelper::generateHexId('T'));
+    // $this->info(CustomHelper::generateHexId('T'));
+    $this->info(bcrypt('Masta626@'));
 })->purpose('Testing code');

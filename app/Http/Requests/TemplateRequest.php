@@ -25,7 +25,12 @@ class TemplateRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'template_uid' => 'required|string|max:20|unique:templates,template_uid',
+            'title' => 'required|string|max:100',
+            'description' => 'nullable|string',
+            'category_id' => 'required|exists:template_categories,category_id',
+            'server_id' => 'required|exists:hosting_servers,server_id',
+            'status' => 'required|integer|in:0,1,2', // Must be one of the allowed statuses
         ];
     }
 

@@ -25,9 +25,8 @@ return new class extends Migration
             $table->unsignedTinyInteger('ram');
             $table->unsignedSmallInteger('disk_size');
             $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
-            $table->softDeletes();
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

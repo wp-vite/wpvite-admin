@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserRequest extends FormRequest
+class UserSiteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,15 +25,12 @@ class UserRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name' => 'required|string|max:50',
-            'last_name' => 'required|string|max:50',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:admin,user',
-            'status' => 'required|in:0,1,2',
-            'mobile' => 'required|numeric|unique:users,mobile',
-            'isd_code' => 'required|exists:countries,isd_code',
-            'country_id' => 'required|exists:countries,country_id',
+            'site_uid' => 'required|string|max:20|unique:user_sites,site_uid',
+            'user_id' => 'required|exists:users,id',
+            'template_id' => 'required|exists:templates,template_id',
+            'server_id' => 'required|exists:hosting_servers,server_id',
+            'domain' => 'required|string|unique:user_sites,domain|regex:/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
+            'status' => 'required|integer|in:0,1,3', // Must be one of the allowed statuses
         ];
     }
 
