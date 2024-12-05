@@ -10,5 +10,5 @@ Artisan::command('inspire', function () {
 
 Artisan::command('hello', function () {
     // $this->info(CustomHelper::generateHexId('T'));
-    $this->info(bcrypt('Masta626@'));
+    // $this->info(bcrypt('Masta626@'));
 })->purpose('Testing code');

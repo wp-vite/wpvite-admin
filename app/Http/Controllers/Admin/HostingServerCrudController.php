@@ -45,6 +45,46 @@ class HostingServerCrudController extends CrudController
          * Columns can be defined using the fluent syntax:
          * - CRUD::column('price')->type('number');
          */
+
+        $this->crud->removeColumns(['status', 'instance_id', 'virtualmin_url']);
+
+        $tinyIntFields  = ['max_sites', 'cpu', 'ram', 'disk_size'];
+        foreach($tinyIntFields as $field) {
+            $this->crud->column($field)->type('number');
+        }
+
+        $this->crud->addColumn([
+            'name' => 'status_label', // Use accessor attribute
+            'label' => 'Status', // Column label
+            'type' => 'text', // Display the resolved label as plain text
+        ]);
+        $this->crud->column('status_label')->after('name');
+    }
+
+    /**
+     * Define what happens when the Show operation is loaded.
+     *
+     * @see https://backpackforlaravel.com/docs/crud-operation-show
+     * @return void
+     */
+    protected function setupShowOperation()
+    {
+        // automatically add the columns
+        $this->autoSetupShowOperation();
+
+        $this->crud->removeColumns(['status']);
+
+        $tinyIntFields  = ['max_sites', 'cpu', 'ram', 'disk_size'];
+        foreach($tinyIntFields as $field) {
+            $this->crud->column($field)->type('number');
+        }
+
+        $this->crud->addColumn([
+            'name' => 'status_label', // Use accessor attribute
+            'label' => 'Status', // Column label
+            'type' => 'text', // Display the resolved label as plain text
+        ]);
+        $this->crud->column('status_label')->after('name');
     }
 
     /**
@@ -62,6 +102,9 @@ class HostingServerCrudController extends CrudController
          * Fields can be defined using the fluent syntax:
          * - CRUD::field('price')->type('number');
          */
+
+        // Server uid
+        $this->crud->removeField('server_uid');
 
         // Provider
         $this->crud->addField([
