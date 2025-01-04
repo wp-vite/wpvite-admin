@@ -127,7 +127,7 @@ class HostingServerCrudController extends CrudController
         ]);
 
         // Public ip
-        $this->crud->field('public_ip')->after('instance_id')->wrapper([
+        $this->crud->field('public_ip')->wrapper([
             'class' => 'form-group col-md-6',
         ]);
 
@@ -173,6 +173,18 @@ class HostingServerCrudController extends CrudController
             'wrapperAttributes' => [
                 'class' => 'form-group col-md-6',
             ],
+        ]);
+
+        // Authorization
+        $this->crud->addField([
+            'name' => 'authorization',
+            'label' => 'Authorization (JSON only)',
+            'type' => 'textarea',
+            'attributes' => [
+                // 'placeholder'  => "{\"key1\":\"value1\", \"key2\":\"value2\"}",
+                'placeholder'  => json_encode(["key1" => "value1", "key2" => "value2"], JSON_PRETTY_PRINT),
+                'rows'  => 5,
+            ]
         ]);
     }
 

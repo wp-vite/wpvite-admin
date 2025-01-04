@@ -16,10 +16,13 @@ class UserSite extends Model
     protected $fillable = [
         'site_uid',
         'user_id',
+        'status',
         'template_id',
         'server_id',
         'domain',
-        'status'
+        'root_directory',
+        'dns_provider', // cloudflare
+        'dns_record_id',
     ];
 
     protected static function boot()

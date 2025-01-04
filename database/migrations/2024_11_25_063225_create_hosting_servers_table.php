@@ -20,12 +20,13 @@ return new class extends Migration
             $table->string('public_ip', 45);
             $table->string('private_ip', 45)->nullable();
             $table->string('instance_id', 100)->nullable();
-            $table->string('virtualmin_url', 255);
             $table->unsignedTinyInteger('max_sites');
             $table->unsignedTinyInteger('cpu');
             $table->unsignedTinyInteger('ram');
             $table->unsignedSmallInteger('disk_size');
             $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
+            $table->string('virtualmin_url', 255);
+            $table->json('authorization');
             $table->timestamps();
             $table->softDeletes();
         });

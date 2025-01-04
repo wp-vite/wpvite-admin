@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id('site_id');
             $table->string('site_uid', 20)->unique();
             $table->foreignId('user_id')->constrained();
+            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 3 => Suspended
             $table->foreignId('template_id')->constrained('templates', 'template_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
-            $table->string('domain')->unique();
-            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 3 => Suspended
+            $table->string('domain')->nullable()->default(null)->unique();
+            $table->string('root_directory')->nullable()->default(null);
+            $table->string('dns_provider', 30)->nullable()->default(null);
+            $table->string('dns_record_id', 50)->unique()->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes()->index();
 

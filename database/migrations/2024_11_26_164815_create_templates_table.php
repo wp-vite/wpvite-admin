@@ -16,14 +16,19 @@ return new class extends Migration
             $table->string('template_uid', 20)->unique();
             $table->string('title', 100);
             $table->text('description')->nullable();
+            $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
             $table->foreignId('category_id')->constrained('template_categories', 'category_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
-            $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
+            $table->string('domain')->nullable()->default(null)->unique();
+            $table->string('root_directory')->nullable()->default(null);
+            $table->string('dns_provider', 30)->nullable()->default(null);
+            $table->string('dns_record_id', 50)->unique()->nullable()->default(null);
             $table->timestamps();
             $table->softDeletes();
 
             $table->index('status');
         });
+
     }
 
     /**

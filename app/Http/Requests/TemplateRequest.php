@@ -25,7 +25,6 @@ class TemplateRequest extends FormRequest
     public function rules()
     {
         return [
-            'template_uid' => 'required|string|max:20|unique:templates,template_uid',
             'title' => 'required|string|max:100',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:template_categories,category_id',

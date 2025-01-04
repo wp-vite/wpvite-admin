@@ -21,7 +21,11 @@ class Template extends Model
         'description',
         'category_id',
         'server_id',
-        'status'
+        'status',
+        'domain',
+        'root_directory',
+        'dns_provider', // cloudflare
+        'dns_record_id',
     ];
 
     protected static function boot()
@@ -32,5 +36,10 @@ class Template extends Model
             // Generate a unique alphanumeric ID with a prefix
             $template->template_uid = \App\Helpers\CustomHelper::generateHexId('T');
         });
+    }
+
+    public function server()
+    {
+        return $this->belongsTo(HostingServer::class, 'server_id', 'server_id');
     }
 }

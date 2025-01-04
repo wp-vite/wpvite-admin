@@ -26,7 +26,7 @@ class TemplateCategoryRequest extends FormRequest
     {
         return [
             'category' => 'required|string|unique:template_categories,category',
-            'category_slug' => 'required|string|unique:template_categories,category_slug',
+            // 'category_slug' => 'required|string|unique:template_categories,category_slug',
         ];
     }
 

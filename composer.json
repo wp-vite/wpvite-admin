@@ -7,6 +7,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "aws/aws-sdk-php": "^3.334",
         "backpack/crud": "^6.7",
         "backpack/theme-tabler": "^1.2",
         "laravel/framework": "^11.31",

@@ -28,6 +28,21 @@ class HostingServer extends Model
         'cpu',
         'ram',
         'disk_size',
+
+        /**
+         * JSON
+         * {auth_type: string, auth_source: string}
+         */
+        'authorization',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'authorization',
     ];
 
     protected static function booted()
