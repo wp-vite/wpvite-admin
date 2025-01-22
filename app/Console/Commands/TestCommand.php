@@ -12,6 +12,7 @@ use App\Services\Cloudflare\CloudflareDnsManager;
 use App\Services\Virtualmin\VirtualminSiteManager;
 use Illuminate\Console\Command;
 use Faker\Factory as Faker;
+use App\Services\Ssh\SshService;
 
 class TestCommand extends Command
 {
@@ -35,6 +36,67 @@ class TestCommand extends Command
     public function handle()
     {
         $arg1   = $this->argument('arg1');
+
+        $serverIp   = '13.234.132.6';
+        $targetUser = 'templmarlen4'; // Target user to run the command as
+
+        $output = SshService::create($serverIp)
+            ->usePrivateKey()
+            ->asUser($targetUser)
+            ->execute([
+                'cd /home/' . $targetUser . '/public_html',
+                'ls',
+                'php -v',
+            ]);
+
+        if ($output->isSuccessful()) {
+            echo "Command succeeded: " . $output->getOutput();
+        } else {
+            echo "Command failed with error: " . $output->getErrorOutput();
+        }
+
+        dd("Done.");
+
+        $command = sprintf(
+            "sudo -u %s bash -c 'cd /home/%s/public_html && ls'",
+            $targetUser,
+            $targetUser
+        );
+
+        // Validate private key path
+        if ($privateKeyPath === false) {
+            die('Private key file not found. Please check the path.');
+        }
+
+        // Properly construct the SSH command
+        $sshCommand = sprintf(
+            'ssh -i "%s" %s -o StrictHostKeyChecking=no "%s"',
+            $privateKeyPath,
+            $connection,
+            $command
+        );
+
+        $process = proc_open($sshCommand, [
+            1 => ['pipe', 'w'], // STDOUT
+            2 => ['pipe', 'w'], // STDERR
+        ], $pipes);
+
+        if (is_resource($process)) {
+            $output = stream_get_contents($pipes[1]); // Get STDOUT
+            $errorOutput = stream_get_contents($pipes[2]); // Get STDERR
+
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            $returnCode = proc_close($process);
+
+            if ($returnCode === 0) {
+                dd("Command succeeded: $output");
+            } else {
+                dd("Command failed with error: $errorOutput");
+            }
+        }
+
 
         // $zoneId = resolve(CloudflareDnsManager::class)->getZoneId('template5.wpvite.com');dd($zoneId);
 
