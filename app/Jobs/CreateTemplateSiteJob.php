@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
 class CreateTemplateSiteJob implements ShouldQueue
@@ -49,23 +50,29 @@ class CreateTemplateSiteJob implements ShouldQueue
                 'user' => $siteOwnerUsername,
             ]);
 
-            if($create['status'] && $create['data']['status'] == 'success') {
-                // $domainDetails = $server->domainDetails($this->template->domain);
+            if($create['status']) {
+                $domainDetails = $server->domainDetails($this->template->domain);
 
-                // if($domainDetails['status'] && isset($domainDetails['data']['data'][0]['values'])) {
-                //     $domainData = $domainDetails['data']['data'][0]['values'];
-                //     $root_directory = $domainData['html_directory'][0] ?? null;
-                // }
+                $authData   = $this->template->auth_data;
+                if($domainDetails['status'] && isset($domainDetails['data'])) {
+                    $domainData = $domainDetails['data'];
+                    // $root_directory = $domainData['html_directory'][0] ?? null;
+                    $authData['db_username'] = Crypt::encrypt($domainData['username_for_mysql'][0] ?? null);
+                    $authData['db_password'] = Crypt::encrypt($domainData['password_for_mysql'][0] ?? null);
+                    $authData['db_name'] = $siteOwnerUsername;
+                }
 
                 $root_directory = "/home/{$siteOwnerUsername}/public_html";
 
                 // Update template details
                 $this->template->update([
                     'root_directory' => $root_directory,
+                    'site_owner_username' => $siteOwnerUsername,
+                    'auth_data' => $authData,
                 ]);
             }
         } catch (Exception $e) {
-            Log::error("Failed to create domain for template ID {$this->template->template_uid}: " . $e->getMessage());
+            Log::channel('site_setup')->error("Failed to create domain for template ID {$this->template->template_uid}: " . $e->getMessage());
             throw $e;
         }
     }

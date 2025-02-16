@@ -36,14 +36,14 @@ class CreateDnsRecordJob implements ShouldQueue
                 $this->template->server->public_ip
             );
 
-            if($response['status'] && isset($response['data']['result']['id'])) {
+            if($response['status'] && isset($response['response_data']['result']['id'])) {
                 $this->template->update([
                     'dns_provider' => 'cloudflare',
-                    'dns_record_id' => $response['data']['result']['id'],
+                    'dns_record_id' => $response['response_data']['result']['id'],
                 ]);
             }
         } catch (Exception $e) {
-            Log::error("CloudflareDnsManager: Failed to add DNS records for {$this->template->domain}: " . $e->getMessage());
+            Log::channel('site_setup')->error("CloudflareDnsManager: Failed to add DNS records for {$this->template->domain}: " . $e->getMessage());
             throw $e;
         }
     }

@@ -32,7 +32,13 @@ class VirtualminSiteManager extends Virtualmin
             'web' => '',
         ], $options);
 
-        return $this->makeApiRequest($command, $params);
+        $response   = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+            return ['status' => true, 'data' => $response['response_data']['output']];
+        }
+
+        return $response;
     }
 
     /**
@@ -47,7 +53,13 @@ class VirtualminSiteManager extends Virtualmin
         $command = "delete-domain";
         $params = ['domain' => $domain];
 
-        return $this->makeApiRequest($command, $params);
+        $response  = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+            return ['status' => true, 'data' => $response['response_data']['output']];
+        }
+
+        return $response;
     }
 
     /**
@@ -65,36 +77,56 @@ class VirtualminSiteManager extends Virtualmin
             'multiline' => ''
         ];
 
-        return $this->makeApiRequest($command, $params);
+        $response  = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && isset($response['response_data']['data'][0]['values'])) {
+            $domainData = $response['response_data']['data'][0]['values'];
+            // $root_directory = $domainData['html_directory'][0] ?? null;
+            return ['status' => true, 'data' => $domainData];
+        }
+
+        return $response;
     }
 
     /**
-     * Suspend a domain.
+     * Disable a domain.
      *
-     * @param string $domain The domain name to suspend.
+     * @param string $domain The domain name to disable.
      * @return array
      * @throws Exception
      */
-    public function suspendDomain(string $domain): array
+    public function disableDomain(string $domain): array
     {
-        $command = "suspend-domain";
+        $command = "disable-domain";
         $params = ['domain' => $domain];
 
-        return $this->makeApiRequest($command, $params);
+        $response  = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+            return ['status' => true, 'data' => $response['response_data']['output']];
+        }
+
+        return $response;
     }
 
     /**
-     * Unsuspend a domain.
+     * Enable a domain.
      *
-     * @param string $domain The domain name to unsuspend.
+     * @param string $domain The domain name to enable.
      * @return array
      * @throws Exception
      */
-    public function unsuspendDomain(string $domain): array
+    public function enableDomain(string $domain): array
     {
-        $command = "unsuspend-domain";
+        $command = "enable-domain";
         $params = ['domain' => $domain];
 
-        return $this->makeApiRequest($command, $params);
+        $response  = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+            return ['status' => true, 'data' => $response['response_data']['output']];
+        }
+
+        return $response;
     }
 }

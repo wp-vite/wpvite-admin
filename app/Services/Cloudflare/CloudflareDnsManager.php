@@ -51,6 +51,45 @@ class CloudflareDnsManager
     }
 
     /**
+     * Get record details.
+     *
+     * @param string $domain
+     * @param string $ipAddress
+     * @return array
+     * @throws Exception
+     */
+    public function getRecord(string $domain): array
+    {
+        // Step 1: Get the Zone ID for the domain
+        $zoneId = $this->getZoneId($domain);
+
+        if (!$zoneId) {
+            Log::error("Zone ID not found for domain: {$domain}");
+            throw new Exception("Zone ID not found for domain: {$domain}");
+        }
+
+        // Step 2: Create the DNS record
+        $params = [
+            'name' => $domain,
+            'match' => 'all'
+        ];
+
+        $path    = "/zones/{$zoneId}/dns_records?". http_build_query($params);
+        $response   = $this->makeApiRequest('GET', $path, []);
+
+        $records = $response['response_data']['result'] ?? [];
+        if(!$records) {
+            return [];
+        }
+
+        $records = array_filter($records, function($record) use ($domain) {
+            return $record['name'] == $domain;
+        });
+
+        return $records[0] ?? [];
+    }
+
+    /**
      * Get the Zone ID for a domain.
      *
      * @param string $domain
@@ -68,7 +107,7 @@ class CloudflareDnsManager
             'name' => $this->extractBaseDomain($domain),
         ]);
 
-        $zones = $response['data']['result'] ?? [];
+        $zones = $response['response_data']['result'] ?? [];
         return $zones[0]['id'] ?? null;
     }
 

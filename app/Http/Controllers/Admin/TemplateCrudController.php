@@ -57,9 +57,61 @@ class TemplateCrudController extends CrudController
         $this->crud->removeColumns([
             'domain',
             'root_directory',
+            'site_owner_username',
             'dns_provider',
             'dns_record_id',
+            'auth_data',
         ]);
+    }
+
+    /**
+     * Define what happens when the Show operation is loaded.
+     */
+    protected function setupShowOperation()
+    {
+        // automatically add the columns
+        $this->autoSetupShowOperation();
+
+        $this->crud->removeColumns([
+            'auth_data',
+        ]);
+
+        $this->crud->addColumn([
+            'name'      => 'auth_data',
+            'label'     => 'Authentication Data',
+            'type'      => 'custom_html',
+            'value' => function ($entry) {
+                $authData = $entry->auth_data;
+
+                if(!$authData) {
+                    return '';
+                }
+
+                if ($authData instanceof \Illuminate\Database\Eloquent\Casts\ArrayObject) {
+                    $authData = $authData->toArray();
+                }
+
+                // Convert associative array to key-value format
+                $formattedData = <<<HER
+                    <table>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </tr>
+                HER;
+
+                foreach ($authData as $key => $val) {
+                    if(in_array($key, ['db_password', 'db_username', 'admin_password'])) {
+                        $val    = "[hidden]";
+                    }
+                    $formattedData  .= "<tr><td>{$key}</td><td>{$val}</td></tr>";
+                }
+
+                $formattedData  .= "</table>";
+
+                return $formattedData;
+            },
+        ])->beforeColumn('created_at');
     }
 
     /**
@@ -83,8 +135,10 @@ class TemplateCrudController extends CrudController
             'template_uid',
             'domain',
             'root_directory',
+            'site_owner_username',
             'dns_provider',
             'dns_record_id',
+            'auth_data',
         ]);
 
         // Category

@@ -92,7 +92,7 @@ class HttpService
             return [
                 'status' => true,
                 'http_status' => $response->getStatusCode(),
-                'data' => $decodedData,
+                'response_data' => $decodedData,
                 'message' => null,
             ];
         } catch (RequestException $e) {
@@ -103,14 +103,14 @@ class HttpService
             return [
                 'status' => false,
                 'http_status' => $e->getCode(),
-                'data' => null,
+                'response_data' => null,
                 'message' => $message,
             ];
         } catch (Exception $e) {
             return [
                 'status' => false,
                 'http_status' => 500, // Generic server error
-                'data' => null,
+                'response_data' => null,
                 'message' => $e->getMessage(),
             ];
         }

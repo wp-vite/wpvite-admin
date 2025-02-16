@@ -29,7 +29,7 @@ class Virtualmin
     {
         $this->baseUrl  = rtrim($hostingServer->virtualmin_url, '/') .'/';
 
-        $authorization  = json_decode($hostingServer->authorization);
+        $authorization  = $hostingServer->authorization;
         $this->authType = ucfirst(strtolower($authorization->auth_type));
 
         $authSource = $authorization->auth_source;

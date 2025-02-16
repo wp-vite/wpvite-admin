@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Helpers\CustomHelper;
 use App\Jobs\CreateDnsRecordJob;
 use App\Jobs\CreateTemplateSiteJob;
+use App\Jobs\InstallWordPressJob;
 use App\Models\Template;
 use App\Repositories\TemplateRepository;
 use App\Services\AWS\ParameterStore;
@@ -13,6 +14,9 @@ use App\Services\Virtualmin\VirtualminSiteManager;
 use Illuminate\Console\Command;
 use Faker\Factory as Faker;
 use App\Services\Ssh\SshService;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 class TestCommand extends Command
 {
@@ -37,98 +41,54 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
-        $serverIp   = '13.234.132.6';
-        $targetUser = 'templmarlen4'; // Target user to run the command as
+        $template   = Template::where('template_uid', 'T1950D6D0BCBG30U')->first();
 
-        $output = SshService::create($serverIp)
+        // CreateDnsRecordJob::withChain([
+        //     new CreateTemplateSiteJob($template),
+        //     new InstallWordPressJob($template),
+        // ])->dispatch($template);
+        // dd("Done");
+
+        $authData   = $template->auth_data;
+
+        $authData['admin_user']     = CustomHelper::generateRandomUsername(12, 'site');
+        $authData['admin_password'] = CustomHelper::generateRandomPassword();
+        // Update template details
+        $template->update([
+            'auth_data' => $authData,
+        ]);
+
+
+        $sshService = SshService::create($template->server->public_ip)
             ->usePrivateKey()
-            ->asUser($targetUser)
-            ->execute([
-                'cd /home/' . $targetUser . '/public_html',
-                'ls',
-                'php -v',
-            ]);
+            ->asUser($template->site_owner_username);
+
+        $this->info("Starting wordpress setup..");
+        $output = $sshService->execute([
+            'cd '. $template->root_directory,
+            sprintf(
+                'setup-wordpress --template %s --root-dir %s --domain %s --title %s --admin-user %s --admin-pass %s --admin-email %s --db-name %s --db-user %s --db-pass %s',
+                "template-wp-01",
+                escapeshellarg($template->root_directory),
+                escapeshellarg($template->domain),
+                escapeshellarg($template->title .' - Template Site'),
+                escapeshellarg($authData['admin_user']),
+                escapeshellarg($authData['admin_password']),
+                escapeshellarg('support@wpvite.com'),
+                escapeshellarg($authData['db_name']),
+                escapeshellarg(Crypt::decrypt($authData['db_username'])),
+                escapeshellarg(Crypt::decrypt($authData['db_password']))
+            ),
+        ]);
 
         if ($output->isSuccessful()) {
             echo "Command succeeded: " . $output->getOutput();
         } else {
-            echo "Command failed with error: " . $output->getErrorOutput();
+            echo "Command failed with error: " . $output->getOutput();
         }
 
         dd("Done.");
 
-        $command = sprintf(
-            "sudo -u %s bash -c 'cd /home/%s/public_html && ls'",
-            $targetUser,
-            $targetUser
-        );
-
-        // Validate private key path
-        if ($privateKeyPath === false) {
-            die('Private key file not found. Please check the path.');
-        }
-
-        // Properly construct the SSH command
-        $sshCommand = sprintf(
-            'ssh -i "%s" %s -o StrictHostKeyChecking=no "%s"',
-            $privateKeyPath,
-            $connection,
-            $command
-        );
-
-        $process = proc_open($sshCommand, [
-            1 => ['pipe', 'w'], // STDOUT
-            2 => ['pipe', 'w'], // STDERR
-        ], $pipes);
-
-        if (is_resource($process)) {
-            $output = stream_get_contents($pipes[1]); // Get STDOUT
-            $errorOutput = stream_get_contents($pipes[2]); // Get STDERR
-
-            fclose($pipes[1]);
-            fclose($pipes[2]);
-
-            $returnCode = proc_close($process);
-
-            if ($returnCode === 0) {
-                dd("Command succeeded: $output");
-            } else {
-                dd("Command failed with error: $errorOutput");
-            }
-        }
-
-
-        // $zoneId = resolve(CloudflareDnsManager::class)->getZoneId('template5.wpvite.com');dd($zoneId);
-
-        $template   = Template::where('template_uid', 'T1943321419DDQ8J')->first();
-
-        CreateDnsRecordJob::withChain([
-            new CreateTemplateSiteJob($template),
-            // new InstallWordPressJob($template),
-        ])->dispatch($template);
-
-        dd($template->domain);
-
-        $virtualminManager  = resolve(VirtualminSiteManager::class);
-
-        // Step 3: Call the Virtualmin API to create the domain
-        try {
-            $server   = $virtualminManager->server($template->server);
-            // $create = $server->createDomain($domain);
-
-            // if($create['status'] && $create['data']['status'] == 'success') {
-            //     $domainDetails = $server->domainDetails($domain);
-            //     dd($domainDetails);
-            // }
-            $domainDetails = $server->domainDetails($domain);
-            if($domainDetails['status'] && isset($domainDetails['data']['data'][0]['values'])) {
-                $domainData = $domainDetails['data']['data'][0]['values'];
-                $this->info("HTML Directory: ". $domainData['html_directory'][0]);
-            }
-            dd($domainDetails);
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-        }
-        dd($create);
+        // $zoneId = resolve(CloudflareDnsManager::class)->getRecord('template101.wpvite.com');dd($zoneId);
     }
 }

@@ -2,57 +2,61 @@
 
 namespace App\Services\Ssh;
 
-use Exception;
+use phpseclib3\Net\SSH2;
+use phpseclib3\Crypt\PublicKeyLoader;
 use Illuminate\Support\Facades\Config;
+use Exception;
 use RuntimeException;
 
 class SshService
 {
+    protected SSH2 $ssh;
+    protected string $host;
+    protected string $username;
     protected string $privateKeyPath;
-    protected string $connection;
     protected ?string $targetUser = null;
+    protected int $port = 22;
 
     /**
      * Create SSH connection
      * @param string $host
-     * @param string $username
-     * If not provided it will use default from the ENV variable (SSH_USERNAME)
+     * @param string|null $username
+     * If not provided, it will use default from ENV variable (SSH_USERNAME)
      *
-     * @throws \Exception
-     * @return \App\Services\Ssh\SshService
+     * @throws Exception
+     * @return SshService
      */
     public static function create(string $host, string $username = null): self
     {
-        $username   = $username ?? Config::get('wpvite.ssh.username');
-        if(!$username) {
+        $username = $username ?? Config::get('wpvite.ssh.username');
+        if (!$username) {
             throw new Exception("SSH Connection failed: Username required.");
         }
 
-        $connection = sprintf('%s@%s', $username, $host);
-        return new self($connection);
+        return new self($host, $username);
     }
 
-    protected function __construct(string $connection)
+    protected function __construct(string $host, string $username)
     {
-        $this->connection = $connection;
+        $this->host = $host;
+        $this->username = $username;
     }
 
     /**
      * Use Private Key file for authentication
-     * @param string $privateKeyPath
-     * If not provided it will use default from the ENV variable (SSH_PRIVATE_KEY_PATH)
+     * @param string|null $privateKeyPath
+     * If not provided, it will use default from ENV variable (SSH_PRIVATE_KEY_PATH)
      *
-     * @throws \RuntimeException
-     * @return \App\Services\Ssh\SshService
+     * @throws RuntimeException
+     * @return SshService
      */
     public function usePrivateKey(string $privateKeyPath = null): self
     {
-        if(!$privateKeyPath) {
+        if (!$privateKeyPath) {
             $privateKeyPath = Config::get('wpvite.ssh.private_key_path');
         }
 
         $resolvedPath = realpath($privateKeyPath);
-
         if ($resolvedPath === false) {
             throw new RuntimeException('Private key file not found. Please check the path.');
         }
@@ -62,9 +66,9 @@ class SshService
     }
 
     /**
-     * Execute the commands on behalf of this target user
+     * Execute commands as a specific user
      * @param string $targetUser
-     * @return \App\Services\Ssh\SshService
+     * @return SshService
      */
     public function asUser(string $targetUser): self
     {
@@ -73,62 +77,59 @@ class SshService
     }
 
     /**
-     * Commands to execute
+     * Establish SSH connection
+     * @throws RuntimeException
+     */
+    protected function connect()
+    {
+        $this->ssh = new SSH2($this->host, $this->port);
+        $key = PublicKeyLoader::load(file_get_contents($this->privateKeyPath));
+
+        if (!$this->ssh->login($this->username, $key)) {
+            throw new RuntimeException("SSH Authentication Failed for {$this->username}@{$this->host}");
+        }
+    }
+
+    /**
+     * Execute SSH Commands
      * @param array $commands
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @return object
-     *  ->isSuccessful() true|false
+     *  ->isSuccessful() bool
      *  ->getOutput() string
      *  ->getErrorOutput() string
      */
     public function execute(array $commands): object
     {
-        // Securely join commands
-        $command = implode(' && ', array_map('escapeshellcmd', $commands));
+        if (!isset($this->ssh)) {
+            $this->connect();
+        }
 
         if ($this->targetUser) {
-            $command = sprintf(
-                "sudo -u %s bash -c '%s'",
-                $this->targetUser,
-                $command
-            );
+            // Run all commands in a single sudo execution
+            // $commands = implode(" && ", $commands);
+            // $commandString = sprintf("sudo -u %s sh -c %s", $this->targetUser, escapeshellarg($commands));
+            // Ensure URLs or any special characters are properly quoted
+            $commands = array_map(fn($cmd) => str_replace('"', '\"', $cmd), $commands);
+            $commandString = sprintf("sudo -u %s sh -c \"%s\"", escapeshellarg($this->targetUser), implode(" && ", $commands));
+        } else {
+            $commandString = implode(" && ", $commands);
         }
 
-        $sshCommand = sprintf(
-            'ssh -i "%s" %s -o StrictHostKeyChecking=no %s',
-            $this->privateKeyPath,
-            $this->connection,
-            escapeshellarg($command)
-        );
-        // dd($sshCommand);
+        // $commands = implode(" && ", $commands);
+        // dd($commandString);
 
-        $process = proc_open($sshCommand, [
-            1 => ['pipe', 'w'], // STDOUT
-            2 => ['pipe', 'w'], // STDERR
-        ], $pipes);
+        $output = $this->ssh->exec($commandString);
+        $exitCode = $this->ssh->getExitStatus();
 
-        if (!is_resource($process)) {
-            throw new RuntimeException('Failed to initiate SSH process.');
-        }
-
-        $output = stream_get_contents($pipes[1]); // Get STDOUT
-        $errorOutput = stream_get_contents($pipes[2]); // Get STDERR
-
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-
-        $returnCode = proc_close($process);
-
-        return new class($returnCode, $output, $errorOutput) {
+        return new class($exitCode, $output) {
             public bool $success;
             public string $output;
-            public string $errorOutput;
 
-            public function __construct(int $returnCode, string $output, string $errorOutput)
+            public function __construct(int $exitCode, string $output)
             {
-                $this->success = ($returnCode === 0);
+                $this->success = ($exitCode === 0);
                 $this->output = $output;
-                $this->errorOutput = $errorOutput;
             }
 
             public function isSuccessful(): bool
@@ -139,11 +140,6 @@ class SshService
             public function getOutput(): string
             {
                 return $this->output;
-            }
-
-            public function getErrorOutput(): string
-            {
-                return $this->errorOutput;
             }
         };
     }

@@ -19,9 +19,11 @@ return new class extends Migration
             $table->foreignId('template_id')->constrained('templates', 'template_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
             $table->string('domain')->nullable()->default(null)->unique();
-            $table->string('root_directory')->nullable()->default(null);
             $table->string('dns_provider', 30)->nullable()->default(null);
             $table->string('dns_record_id', 50)->unique()->nullable()->default(null);
+            $table->string('root_directory')->nullable()->default(null);
+            $table->string('site_owner_username', 20)->nullable()->default(null);
+            $table->json('auth_data');
             $table->timestamps();
             $table->softDeletes()->index();
 
