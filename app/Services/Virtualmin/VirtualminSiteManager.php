@@ -3,6 +3,7 @@
 namespace App\Services\Virtualmin;
 
 use App\Helpers\CustomHelper;
+use App\Services\Common\TextSimilarityService;
 use Exception;
 
 class VirtualminSiteManager extends Virtualmin
@@ -34,7 +35,7 @@ class VirtualminSiteManager extends Virtualmin
 
         $response   = $this->makeApiRequest($command, $params);
 
-        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+        if($response['status'] && (($response['response_data']['status'] ?? '') == 'success')) {
             return ['status' => true, 'data' => $response['response_data']['output']];
         }
 
@@ -55,7 +56,7 @@ class VirtualminSiteManager extends Virtualmin
 
         $response  = $this->makeApiRequest($command, $params);
 
-        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+        if($response['status'] && (($response['response_data']['status'] ?? '') == 'success')) {
             return ['status' => true, 'data' => $response['response_data']['output']];
         }
 
@@ -102,7 +103,7 @@ class VirtualminSiteManager extends Virtualmin
 
         $response  = $this->makeApiRequest($command, $params);
 
-        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+        if($response['status'] && (($response['response_data']['status'] ?? '') == 'success')) {
             return ['status' => true, 'data' => $response['response_data']['output']];
         }
 
@@ -123,10 +124,28 @@ class VirtualminSiteManager extends Virtualmin
 
         $response  = $this->makeApiRequest($command, $params);
 
-        if($response['status'] && ($response['response_data']['status'] ?? '' == 'success')) {
+        if($response['status'] && (($response['response_data']['status'] ?? '') == 'success')) {
             return ['status' => true, 'data' => $response['response_data']['output']];
         }
 
         return $response;
+    }
+
+    /**
+     * Check error message if domain already exists
+     * @param string $errorMsg
+     * @return bool
+     */
+    public function isDomainExistsError(string $errorMsg)
+    {
+        $expectedMessages = [
+            "You are already hosting this domain",
+            "This domain is already registered",
+            "Hosting for this domain exists",
+            "Domain already exists"
+        ];
+
+        $textSimilarityService  = new TextSimilarityService;
+        return $textSimilarityService->isSimilarToAny($errorMsg, $expectedMessages);
     }
 }

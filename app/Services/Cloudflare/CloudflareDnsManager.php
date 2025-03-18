@@ -47,7 +47,13 @@ class CloudflareDnsManager
         ];
 
         $path    = "/zones/{$zoneId}/dns_records";
-        return $this->makeApiRequest('POST', $path, $params);
+        $response   = $this->makeApiRequest('POST', $path, $params);
+
+        if($response['status'] && isset($response['response_data']['result']['id'])) {
+            return ['status' => true, 'data' => $response['response_data']['result']];
+        }
+
+        return $response;
     }
 
     /**
@@ -77,16 +83,21 @@ class CloudflareDnsManager
         $path    = "/zones/{$zoneId}/dns_records?". http_build_query($params);
         $response   = $this->makeApiRequest('GET', $path, []);
 
-        $records = $response['response_data']['result'] ?? [];
-        if(!$records) {
-            return [];
+        if($response['status'] && isset($response['response_data']['result'])) {
+            $records = $response['response_data']['result'];
+
+            $records = array_filter($records, function($record) use ($domain) {
+                return $record['name'] == $domain;
+            });
+
+            if($records[0] ?? []) {
+                return ['status' => true, 'data' => $records[0]];
+            } else {
+                return ['status' => false, 'message' => 'Record not exists.'];
+            }
         }
 
-        $records = array_filter($records, function($record) use ($domain) {
-            return $record['name'] == $domain;
-        });
-
-        return $records[0] ?? [];
+        return $response;
     }
 
     /**

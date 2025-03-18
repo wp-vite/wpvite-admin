@@ -162,18 +162,18 @@ class TemplateCrudController extends CrudController
         ]);
 
         // Status
-        $this->crud->addField([
-            'name' => 'status',
-            'type' => 'select_from_array',
-            'options' => [
-                1 => 'Active',
-                0 => 'Inactive',
-                2 => 'Maintenance',
-            ],
-            'wrapperAttributes' => [
-                'class' => 'form-group col-md-6',
-            ],
-        ]);
+        // $this->crud->addField([
+        //     'name' => 'status',
+        //     'type' => 'select_from_array',
+        //     'options' => [
+        //         1 => 'Active',
+        //         0 => 'Inactive',
+        //         2 => 'Maintenance',
+        //     ],
+        //     'wrapperAttributes' => [
+        //         'class' => 'form-group col-md-6',
+        //     ],
+        // ]);
     }
 
     /**
@@ -191,6 +191,9 @@ class TemplateCrudController extends CrudController
     {
         // Step 1: Validate the form input
         $data = $request->all();
+
+        // Status
+        $data['status'] = 10; // Setup Pending
 
         // Step 2: Create the template record in the database
         $template = $this->crud->create($data);

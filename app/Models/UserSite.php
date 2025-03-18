@@ -17,9 +17,31 @@ class UserSite extends Model
     protected $fillable = [
         'site_uid',
         'user_id',
-        'status',
         'template_id',
         'server_id',
+
+        /**
+         * status
+         *  0 => Inactive
+         *  1 => Active
+         *  2 => Maintenance
+         *  3 => Suspended
+         *  10 => Setup Pending
+         *  11 => Setup In Progress
+         *  12 => Setup Error
+         */
+        'status',
+
+        /**
+         * setup_progress
+         *  1 => Setup Initialized
+         *  2 => DNS Setup Pending
+         *  3 => Virtual Site Setup Pending
+         *  4 => Wordpress Setup Pending
+         *  100 => Setup Completed
+         */
+        'setup_progress',
+
         'domain',
         'dns_provider', // cloudflare
         'dns_record_id',
@@ -59,5 +81,20 @@ class UserSite extends Model
             // Generate a unique alphanumeric ID with a prefix
             $site->site_uid = \App\Helpers\CustomHelper::generateHexId('S');
         });
+    }
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class, 'template_id', 'template_id');
+    }
+
+    public function server()
+    {
+        return $this->belongsTo(HostingServer::class, 'server_id', 'server_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

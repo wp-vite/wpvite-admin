@@ -10,6 +10,7 @@ use App\Models\Template;
 use App\Repositories\TemplateRepository;
 use App\Services\AWS\ParameterStore;
 use App\Services\Cloudflare\CloudflareDnsManager;
+use App\Services\Common\TextSimilarityService;
 use App\Services\Virtualmin\VirtualminSiteManager;
 use Illuminate\Console\Command;
 use Faker\Factory as Faker;
@@ -41,7 +42,33 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
+        $expectedMessages = [
+            "You are already hosting this domain",
+            "This domain is already registered",
+            "Hosting for this domain exists"
+        ];
+
+        $errorMsg   = "This domain is already exist";
+
+        $textSimilarityService  = resolve(TextSimilarityService::class);
+        if($textSimilarityService->isSimilarToAny($errorMsg, $expectedMessages)) {
+            dd("Similar.");
+        }
+        dd("not same.");
+
         $template   = Template::where('template_uid', 'T1950D6D0BCBG30U')->first();
+
+        // dd(resolve(CloudflareDnsManager::class)->getRecord($template->domain));
+        $server = resolve(VirtualminSiteManager::class)->server($template->server);
+
+        $siteOwnerUsername   = strtolower(CustomHelper::generateRandomUsername(12, 'templ'));
+
+        $create = $server->createDomain($template->domain, [
+            // 'plan' => 'default',
+            'user' => $siteOwnerUsername,
+        ]);
+
+        dd($create);
 
         // CreateDnsRecordJob::withChain([
         //     new CreateTemplateSiteJob($template),

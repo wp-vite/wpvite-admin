@@ -26,7 +26,7 @@ class SshService
      * @throws Exception
      * @return SshService
      */
-    public static function create(string $host, string $username = null): self
+    public static function create(string $host, ?string $username = null): self
     {
         $username = $username ?? Config::get('wpvite.ssh.username');
         if (!$username) {
@@ -50,7 +50,7 @@ class SshService
      * @throws RuntimeException
      * @return SshService
      */
-    public function usePrivateKey(string $privateKeyPath = null): self
+    public function usePrivateKey(?string $privateKeyPath = null): self
     {
         if (!$privateKeyPath) {
             $privateKeyPath = Config::get('wpvite.ssh.private_key_path');

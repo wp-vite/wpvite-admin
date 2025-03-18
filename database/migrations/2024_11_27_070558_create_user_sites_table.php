@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id('site_id');
             $table->string('site_uid', 20)->unique();
             $table->foreignId('user_id')->constrained();
-            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 3 => Suspended
+
+            $table->unsignedTinyInteger('status')->default(10); // Setup Pending
+            $table->unsignedTinyInteger('setup_progress')->nullable()->default(null);
+
             $table->foreignId('template_id')->constrained('templates', 'template_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
             $table->string('domain')->nullable()->default(null)->unique();

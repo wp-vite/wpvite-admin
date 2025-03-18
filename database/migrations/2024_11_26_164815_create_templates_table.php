@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('template_uid', 20)->unique();
             $table->string('title', 100);
             $table->text('description')->nullable();
-            $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
+
+            $table->unsignedTinyInteger('status')->default(10); // Setup Pending
+            $table->unsignedTinyInteger('setup_progress')->nullable()->default(null);
+
             $table->foreignId('category_id')->constrained('template_categories', 'category_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
             $table->string('domain')->nullable()->default(null)->unique();
