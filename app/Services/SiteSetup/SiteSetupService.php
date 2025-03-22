@@ -38,7 +38,7 @@ abstract class SiteSetupService
      */
     public function site(object $model)
     {
-        if(!($model instanceof Template) || !($model instanceof UserSite)) {
+        if (!($model instanceof Template || $model instanceof UserSite)) {
             throw new Exception("Invalid site instance.");
         }
         $this->siteModel    = $model;
@@ -51,8 +51,6 @@ abstract class SiteSetupService
     /**
      * Add an A record to Cloudflare DNS.
      *
-     * @param string $domain
-     * @param string $ipAddress
      * @return array
      */
     public function createDnsRecord(): array
@@ -97,8 +95,6 @@ abstract class SiteSetupService
     /**
      * Add an A record to Cloudflare DNS.
      *
-     * @param string $domain
-     * @param string $ipAddress
      * @return array
      */
     public function createTemplateSite(): array
@@ -119,6 +115,8 @@ abstract class SiteSetupService
                 $authData   = $this->siteModel->auth_data;
                 if($domainDetails['status'] && isset($domainDetails['data'])) {
                     $domainData = $domainDetails['data'];
+
+                    $siteOwnerUsername = $domainData['username'][0] ?? null;
                     // $root_directory = $domainData['html_directory'][0] ?? null;
                     $authData['db_username'] = Crypt::encrypt($domainData['username_for_mysql'][0] ?? null);
                     $authData['db_password'] = Crypt::encrypt($domainData['password_for_mysql'][0] ?? null);
@@ -222,7 +220,7 @@ abstract class SiteSetupService
 
     /**
      * setupCompleted is run after the setup is completed
-     * @return array
+     * @return void
      */
     public function setupCompleted()
     {
@@ -232,11 +230,6 @@ abstract class SiteSetupService
         ]);
 
         // Fire any Event here
-
-        return [
-            'status'    => true,
-            'message'   => 'Site setup completed.',
-        ];
     }
 
     /**

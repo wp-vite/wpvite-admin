@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\TemplateRequest;
-use App\Jobs\CreateDnsRecordJob;
-use App\Jobs\CreateTemplateSiteJob;
-use App\Jobs\InstallWordPressJob;
+use App\Jobs\TemplateSiteSetupJob;
 use App\Models\HostingServer;
+use App\Models\Template;
 use App\Models\TemplateCategory;
 use App\Repositories\TemplateRepository;
-use App\Services\Virtualmin\VirtualminSiteManager;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Http\Request;
@@ -34,7 +32,7 @@ class TemplateCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(\App\Models\Template::class);
+        CRUD::setModel(Template::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/template');
         CRUD::setEntityNameStrings('template', 'templates');
     }
@@ -55,12 +53,32 @@ class TemplateCrudController extends CrudController
          */
 
         $this->crud->removeColumns([
+            'status',
+            'setup_progress',
             'domain',
             'root_directory',
             'site_owner_username',
             'dns_provider',
             'dns_record_id',
             'auth_data',
+        ]);
+
+        // Status
+        $this->crud->column([
+            'name' => 'status',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return $entry->status;
+            },
+        ]);
+
+        // setup_progress
+        $this->crud->column([
+            'name' => 'setup_progress',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return $entry->setup_progress;
+            },
         ]);
     }
 
@@ -133,6 +151,8 @@ class TemplateCrudController extends CrudController
         // UID
         $this->crud->removeFields([
             'template_uid',
+            'status',
+            'setup_progress',
             'domain',
             'root_directory',
             'site_owner_username',
@@ -160,20 +180,6 @@ class TemplateCrudController extends CrudController
                 'class' => 'form-group col-md-6',
             ],
         ]);
-
-        // Status
-        // $this->crud->addField([
-        //     'name' => 'status',
-        //     'type' => 'select_from_array',
-        //     'options' => [
-        //         1 => 'Active',
-        //         0 => 'Inactive',
-        //         2 => 'Maintenance',
-        //     ],
-        //     'wrapperAttributes' => [
-        //         'class' => 'form-group col-md-6',
-        //     ],
-        // ]);
     }
 
     /**
@@ -185,6 +191,26 @@ class TemplateCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+
+        // Status
+        $this->crud->addField([
+            'name' => 'status',
+            'type' => 'select_from_array',
+            'options' => Template::status(),
+            'wrapperAttributes' => [
+                'class' => 'form-group col-md-6',
+            ],
+        ]);
+
+        // setup_progress
+        $this->crud->addField([
+            'name' => 'setup_progress',
+            'type' => 'select_from_array',
+            'options' => Template::setupProgress(),
+            'wrapperAttributes' => [
+                'class' => 'form-group col-md-6',
+            ],
+        ]);
     }
 
     public function store(Request $request)
@@ -200,14 +226,39 @@ class TemplateCrudController extends CrudController
         $template->domain   = TemplateRepository::makeTemplateDomain($template);
         $template->save();
 
-        // Dispatch the jobs in a chain
-        // Laravel ensures the next job runs only if the previous job succeeds
-        CreateDnsRecordJob::withChain([
-            new CreateTemplateSiteJob($template),
-            new InstallWordPressJob($template),
-        ])->dispatch($template);
+        // Dispatch the TemplateSiteSetupJob
+        TemplateSiteSetupJob::dispatch($template);
 
         // Redirect with success message
         return redirect()->to($this->crud->route)->with('success', 'Template created and domain setup successfully.');
+    }
+
+    public function update(Request $request)
+    {
+        // Step 1: Validate the form input
+        $data = $request->all();
+
+        $template  = $this->crud->getCurrentEntry();
+
+        // setup_progress
+        if(empty($data['setup_progress'])) {
+            $data['setup_progress'] = null;
+        }
+
+        // Domain
+        if(empty($template->domain)) {
+            $data['domain'] = TemplateRepository::makeTemplateDomain($template);
+        }
+
+        // $request->merge($data);
+
+        // Call Backpack’s default update logic
+        $template->update($data);
+
+        // Dispatch the TemplateSiteSetupJob
+        TemplateSiteSetupJob::dispatch($template);
+
+        // Redirect with success message
+        return redirect()->to($this->crud->route)->with('success', 'Template updated successfully.');
     }
 }
