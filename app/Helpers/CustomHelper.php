@@ -58,7 +58,7 @@ class CustomHelper
      *
      * @return string
      */
-    public static  function generateRandomPassword(int $length = 16): string
+    public static function generateRandomPassword(int $length = 16): string
     {
         // Ensure minimum password length is 8
         if ($length < 8) {
@@ -97,5 +97,31 @@ class CustomHelper
 
         // Combine the first character (alphabet) with the shuffled middle
         return $password[0] . implode('', $middle);
+    }
+
+    /**
+     * Summary of isSiteHttpsWorking
+     * @param string $domain
+     * @return bool
+     */
+    public static function isSiteHttpsWorking(string $domain): bool
+    {
+        $url = "https://{$domain}";
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_NOBODY => true, // no content, just headers
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_SSL_VERIFYPEER => true, // verify SSL
+        ]);
+
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $sslError = curl_errno($ch);
+        curl_close($ch);
+
+        // HTTP 200 or 301/302 + no SSL error => SSL is working
+        return in_array($httpCode, [200, 301, 302]) && $sslError === 0;
     }
 }

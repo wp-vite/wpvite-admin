@@ -68,8 +68,14 @@ class TemplateSiteSetupService extends SiteSetupService
                 }
             }
 
+            // Check site is accessible with https
+            if(!CustomHelper::isSiteHttpsWorking($this->siteModel->domain)) {
+                $response   = $this->generateSsl();
+            }
+
             // Setup completed
             $this->setupCompleted();
+
             return ['status' => true, 'message'=> 'Site setup completed.'];
         } catch (Exception $e) {
             $this->statusUpdate(12); // Setup Error

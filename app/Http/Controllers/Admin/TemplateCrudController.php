@@ -91,9 +91,30 @@ class TemplateCrudController extends CrudController
         $this->autoSetupShowOperation();
 
         $this->crud->removeColumns([
+            'status',
+            'setup_progress',
             'auth_data',
         ]);
 
+        // Status
+        $this->crud->addColumn([
+            'name' => 'status',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return Template::status($entry->status);
+            },
+        ])->afterColumn('category_id');
+
+        // setup_progress
+        $this->crud->addColumn([
+            'name' => 'setup_progress',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return Template::setupProgress($entry->setup_progress);
+            },
+        ])->afterColumn('status');
+
+        // Auth data
         $this->crud->addColumn([
             'name'      => 'auth_data',
             'label'     => 'Authentication Data',
@@ -120,7 +141,7 @@ class TemplateCrudController extends CrudController
 
                 foreach ($authData as $key => $val) {
                     if(in_array($key, ['db_password', 'db_username', 'admin_password'])) {
-                        $val    = "[hidden]";
+                        $val    = "*******";
                     }
                     $formattedData  .= "<tr><td>{$key}</td><td>{$val}</td></tr>";
                 }

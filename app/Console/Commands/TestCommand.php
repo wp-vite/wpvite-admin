@@ -48,7 +48,7 @@ class TestCommand extends Command
         $siteSetupService   = resolve(TemplateSiteSetupService::class);
         $siteSetupService->site($template);
 
-        dd($siteSetupService->runSetup());
+        dd($siteSetupService->generateSsl());
 
 
         // CreateDnsRecordJob::withChain([

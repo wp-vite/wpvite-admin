@@ -132,6 +132,30 @@ class VirtualminSiteManager extends Virtualmin
     }
 
     /**
+     * Generate SSL Certificate.
+     *
+     * @param string $domain The domain name to enable.
+     * @return array
+     * @throws Exception
+     */
+    public function generateSsl(string $domain): array
+    {
+        $command = "generate-letsencrypt-cert";
+        $params = [
+            'domain' => $domain,
+            'renew' => ''
+        ];
+
+        $response  = $this->makeApiRequest($command, $params);
+
+        if($response['status'] && (($response['response_data']['status'] ?? '') == 'success')) {
+            return ['status' => true, 'data' => $response['response_data']['output']];
+        }
+
+        return $response;
+    }
+
+    /**
      * Check error message if domain already exists
      * @param string $errorMsg
      * @return bool

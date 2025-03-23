@@ -219,6 +219,27 @@ abstract class SiteSetupService
     }
 
     /**
+     * Summary of generateSsl
+     * @return array|array{message: string, status: bool}
+     */
+    public function generateSsl()
+    {
+        try {
+            $server = $this->virtualminSiteManager->server($this->siteModel->server);
+            $response = $server->generateSsl($this->siteModel->domain);
+
+           return $response;
+        } catch (Exception $e) {
+            Log::channel('site_setup')->error("Failed to generate SSL for the domain {$this->siteModel->domain} (template ID {$this->siteModel->template_uid}): " . $e->getMessage());
+            return [
+                'status'    => false,
+                'message'   => $e->getMessage()
+            ];
+        }
+    }
+
+
+    /**
      * setupCompleted is run after the setup is completed
      * @return void
      */
