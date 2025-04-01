@@ -79,7 +79,7 @@ class UserSite extends Model
 
         static::creating(function ($site) {
             // Generate a unique alphanumeric ID with a prefix
-            $site->site_uid = \App\Helpers\CustomHelper::generateHexId('S');
+            $site->site_uid = \App\Services\Common\UidService::generate('S');
         });
     }
 

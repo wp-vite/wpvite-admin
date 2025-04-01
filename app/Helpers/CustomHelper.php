@@ -8,25 +8,6 @@ use Illuminate\Support\Str;
 class CustomHelper
 {
     /**
-     * Generate Hex Id
-     * @param string $prefix
-     * @param bool $randomSuffix Make more unique
-     * @param string $case upper|lower
-     * @return string
-     */
-    public static function generateHexId(string $prefix = '', bool $randomSuffix = true, string $case = 'upper')
-    {
-        $timestamp = dechex((int) (microtime(true) * 1000)); // Millisecond precision
-        $id = $prefix . $timestamp;
-
-        if($randomSuffix) {
-            $id .= Str::random(4);
-        }
-
-        return ($case == 'lower') ? strtolower($id) : strtoupper($id);
-    }
-
-    /**
      * Generate Username
      * @param int $maxLength
      * @param bool $randomSuffix

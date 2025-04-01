@@ -13,25 +13,28 @@ return new class extends Migration
     {
         Schema::create('templates', function (Blueprint $table) {
             $table->id('template_id');
-            $table->string('template_uid', 20)->unique();
+            $table->string('template_uid', 15)->unique();
             $table->string('title', 100);
             $table->text('description')->nullable();
 
-            $table->unsignedTinyInteger('status')->default(10); // Setup Pending
-            $table->unsignedTinyInteger('setup_progress')->nullable()->default(null);
-
             $table->foreignId('category_id')->constrained('template_categories', 'category_id');
             $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
-            $table->string('domain')->nullable()->default(null)->unique();
-            $table->string('dns_provider', 30)->nullable()->default(null);
-            $table->string('dns_record_id', 50)->unique()->nullable()->default(null);
-            $table->string('root_directory')->nullable()->default(null);
-            $table->string('site_owner_username', 20)->nullable()->default(null);
+
+            $table->unsignedTinyInteger('status')->default(10); // Setup Pending
+            $table->unsignedTinyInteger('setup_progress')->nullable();
+            $table->timestamp('published_at')->nullable();
+
+            $table->string('domain')->nullable()->unique();
+            $table->string('dns_provider', 30)->nullable();
+            $table->string('dns_record_id', 50)->nullable()->unique();
+            $table->string('root_directory')->nullable();
+            $table->string('site_owner_username', 20)->nullable();
             $table->json('auth_data');
             $table->timestamps();
             $table->softDeletes();
 +
             $table->index('status');
+            $table->index('published_at');
         });
 
     }

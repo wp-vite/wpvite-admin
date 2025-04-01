@@ -11,6 +11,7 @@ use App\Repositories\TemplateRepository;
 use App\Services\AWS\ParameterStore;
 use App\Services\Cloudflare\CloudflareDnsManager;
 use App\Services\Common\TextSimilarityService;
+use App\Services\SiteSetup\TemplatePublisherService;
 use App\Services\SiteSetup\TemplateSiteSetupService;
 use App\Services\Virtualmin\VirtualminSiteManager;
 use Illuminate\Console\Command;
@@ -43,7 +44,10 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
-        $template   = Template::where('template_uid', 'T193C76EEE401XA0')->first();
+        $template   = Template::where('template_uid', 'T195BF924EAF62P0')->first();
+
+        $templatePublisher   = resolve(TemplatePublisherService::class);
+        dd($templatePublisher->publish($template));
 
         $siteSetupService   = resolve(TemplateSiteSetupService::class);
         $siteSetupService->site($template);

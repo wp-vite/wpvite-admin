@@ -62,7 +62,7 @@ class HostingServer extends Model
     {
         static::creating(function ($hostingServer) {
             // Generate a unique alphanumeric ID with a prefix
-            $hostingServer->server_uid = \App\Helpers\CustomHelper::generateHexId('H', false);
+            $hostingServer->server_uid = \App\Services\Common\UidService::generate('H');
         });
     }
 

@@ -81,7 +81,7 @@ class Template extends Model
 
         static::creating(function ($template) {
             // Generate a unique alphanumeric ID with a prefix
-            $template->template_uid = \App\Helpers\CustomHelper::generateHexId('T');
+            $template->template_uid = \App\Services\Common\UidService::generate('T');
         });
     }
 

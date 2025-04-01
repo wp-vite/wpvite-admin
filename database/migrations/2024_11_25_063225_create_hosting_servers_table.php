@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('hosting_servers', function (Blueprint $table) {
             $table->id('server_id');
-            $table->string('server_uid', 20)->unique();
+            $table->string('server_uid', 15)->unique();
             $table->string('name', 50);
             $table->string('provider', 20);
             $table->string('instance_type', 30);

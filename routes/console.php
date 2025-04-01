@@ -9,6 +9,11 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote')->hourly();
 
 Artisan::command('hello', function () {
-    // $this->info(CustomHelper::generateHexId('T'));
+    $uid    = \App\Services\Common\UidService::generate('T1');
+    $timestamp = \App\Services\Common\UidService::timestamp($uid);
+    $prefix = \App\Services\Common\UidService::prefix($uid);
+
+    dd([$uid, $timestamp->format('c'), $prefix]);
+    $this->info(\App\Services\Common\UidService::generate('T'));
     // $this->info(bcrypt('Masta626@'));
 })->purpose('Testing code');
