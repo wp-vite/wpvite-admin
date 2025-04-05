@@ -6,6 +6,7 @@ use App\Helpers\CustomHelper;
 use App\Models\Template;
 use App\Repositories\TemplateRepository;
 use App\Services\SiteSetup\TemplateSiteSetupService;
+use App\Services\Template\TemplateService;
 use App\Services\Virtualmin\VirtualminSiteManager;
 use Exception;
 use Illuminate\Foundation\Queue\Queueable;
@@ -37,10 +38,10 @@ class TemplateSiteSetupJob implements ShouldQueue
      * @param VirtualminSiteManager $virtualminManager
      * @return array
      */
-    public function handle(TemplateSiteSetupService $siteSetupService): array
+    public function handle(): array
     {
-        $siteSetupService->site($this->template);
+        $templateSetup  = TemplateService::setup($this->template);
 
-        return $siteSetupService->runSetup();
+        return $templateSetup->run();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\SiteSetup;
+namespace App\Services\Template;
 
 use App\Helpers\CustomHelper;
 use App\Models\Template;
@@ -14,13 +14,13 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
-class TemplateSiteSetupService extends SiteSetupService
+class TemplateSiteSetup extends SiteSetupService
 {
     /**
-     * Summary of runSetup
+     * Summary of run
      * @return array|array{message: string, status: bool}
      */
-    public function runSetup()
+    public function run()
     {
         try {
             if($this->siteStatus !== 10) {

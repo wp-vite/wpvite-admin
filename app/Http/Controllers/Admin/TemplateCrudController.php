@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Operations\PublishOperation;
 use App\Http\Requests\TemplateRequest;
 use App\Jobs\TemplateSiteSetupJob;
 use App\Models\HostingServer;
 use App\Models\Template;
 use App\Models\TemplateCategory;
 use App\Repositories\TemplateRepository;
+use App\Services\SiteSetup\TemplatePublisherService;
+use App\Services\Template\TemplateService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Illuminate\Http\Request;
+use Prologue\Alerts\Facades\Alert;
 
 /**
  * Class TemplateCrudController
@@ -24,6 +28,7 @@ class TemplateCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use PublishOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -35,6 +40,8 @@ class TemplateCrudController extends CrudController
         CRUD::setModel(Template::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/template');
         CRUD::setEntityNameStrings('template', 'templates');
+
+        $this->crud->allowAccess('publish');
     }
 
     /**
@@ -281,5 +288,22 @@ class TemplateCrudController extends CrudController
 
         // Redirect with success message
         return redirect()->to($this->crud->route)->with('success', 'Template updated successfully.');
+    }
+
+    public function handlePublish($id)
+    {
+        $template = Template::findOrFail($id);
+        // $template  = $this->crud->getCurrentEntry();
+
+        $result = TemplateService::publish($template);
+
+        if ($result['status']) {
+            Alert::success('Template published successfully. ' . $template->template_uid)->flash();
+        } else {
+            Alert::error(($result['message'] ?? 'Failed to publish. ') . $template->template_uid)->flash();
+        }
+
+        // Redirect
+        return redirect()->to($this->crud->route."/{$id}/show");
     }
 }

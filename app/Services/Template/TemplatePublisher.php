@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\SiteSetup;
+namespace App\Services\Template;
 
 use App\Models\Template;
 use App\Services\Ssh\SshService;
@@ -8,22 +8,22 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 
-class TemplatePublisherService
+class TemplatePublisher
 {
-    public function __construct()
-    {
-        //
-    }
-
+    /**
+     * Summary of publish
+     * @param \App\Models\Template $template
+     * @return array{message: string, status: bool}
+     */
     public function publish(Template $template): array
     {
         try {
             $siteOwnerUser = $template->site_owner_username;
-            $backupPath = "/home/{$siteOwnerUser}/wpvite-backups";
-            $dbDump = "{$backupPath}/db.sql.gz";
-            $uploadsZip = "{$backupPath}/uploads.zip";
+            $localBackupPath = "/home/{$siteOwnerUser}/wpvite-backups";
+            $dbDump = "{$localBackupPath}/db.sql.gz";
+            $uploadsZip = "{$localBackupPath}/uploads.zip";
 
-            $s3Path = "s3://". Config::get('filesystems.disks.s3_admin.bucket') ."/templates/{$template->template_uid}/v1.0";
+            $s3BackupPath = TemplateService::getS3BackupPath($template, 'v1.0');
 
             $authData = $template->auth_data;
             if(empty($authData['db_name'] ?? '') || empty($authData['db_username'] ?? '') || empty($authData['db_password'] ?? '')) {
@@ -34,37 +34,26 @@ class TemplatePublisherService
             $dbUsername = Crypt::decrypt($authData['db_username']);
             $dbPassword = Crypt::decrypt($authData['db_password']);
 
-            // File::makeDirectory($backupPath, 777, true, true);
-
             // Connect SSH
             $sshService = SshService::create($template->server->public_ip)
                 ->usePrivateKey()
                 ->asUser($siteOwnerUser);
 
-            // 1. SSH and dump database
-            // $sshService->execute([
-            //     "mkdir -p {$backupPath}",
-            //     "sudo chmod -R 777 {$backupPath}",
-            // ]);
             $output = $sshService->execute([
-                "mkdir -p {$backupPath}",
+                "mkdir -p {$localBackupPath}",
                 "mysqldump -u {$dbUsername} -p'{$dbPassword}' {$dbName} | gzip > {$dbDump}",
                 "cd /home/{$siteOwnerUser}/public_html/content && zip -r {$uploadsZip} uploads",
-                // "chown -R www-data {$backupPath} && chmod -R 777 {$backupPath}",
-                "aws s3 cp {$dbDump} {$s3Path}/db.sql.gz",
-                "aws s3 cp {$dbDump} {$s3Path}/uploads.zip",
+                "aws s3 cp {$dbDump} {$s3BackupPath}/db.sql.gz",
+                "aws s3 cp {$dbDump} {$s3BackupPath}/uploads.zip",
             ]);
-            // $sshService->asUser('ubuntu')->execute([
-            //     "sudo chown -R www-data {$backupPath} && sudo chmod -R 777 {$backupPath}",
-            // ]);
 
-            dd($output->getOutput());
+            // dd($output->getOutput());
 
             // 3. Update template model
             // $template->update([
             //     'is_published' => true,
             //     'published_version' => 'v1.0',
-            //     'backup_path' => $s3Path,
+            //     'backup_path' => $s3BackupPath,
             //     'published_at' => now(),
             // ]);
 
