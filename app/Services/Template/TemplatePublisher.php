@@ -3,6 +3,7 @@
 namespace App\Services\Template;
 
 use App\Models\Template;
+use App\Models\TemplateVersion;
 use App\Services\Ssh\SshService;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
@@ -23,7 +24,8 @@ class TemplatePublisher
             $dbDump = "{$localBackupPath}/db.sql.gz";
             $uploadsZip = "{$localBackupPath}/uploads.zip";
 
-            $s3BackupPath = TemplateService::getS3BackupPath($template, 'v1.0');
+            $newVersion = TemplateService::getNewVersion($template);
+            $s3BackupPath = TemplateService::getS3BackupPath($template, $newVersion);
 
             $authData = $template->auth_data;
             if(empty($authData['db_name'] ?? '') || empty($authData['db_username'] ?? '') || empty($authData['db_password'] ?? '')) {
@@ -50,12 +52,14 @@ class TemplatePublisher
             // dd($output->getOutput());
 
             // 3. Update template model
-            // $template->update([
-            //     'is_published' => true,
-            //     'published_version' => 'v1.0',
-            //     'backup_path' => $s3BackupPath,
-            //     'published_at' => now(),
-            // ]);
+            $template->update([
+                'published_at' => now(),
+                'current_version'   => $newVersion,
+            ]);
+            TemplateVersion::create([
+                'template_id'   => $template->template_id,
+                'version'   => $newVersion,
+            ]);
 
             return ['status' => true, 'message' => 'Template published successfully'];
         } catch (\Exception $e) {

@@ -47,6 +47,21 @@ class TemplateService
         return "s3://". Config::get('filesystems.disks.s3_admin.bucket') ."/templates/{$template->template_uid}/{$backupVersion}";
     }
 
+    /**
+     * Summary of getNewVersion
+     * @param \App\Models\Template $template
+     * @param bool $major
+     * @return float
+     */
+    public static function getNewVersion(Template $template, bool $major = false): float
+    {
+        $latestVersion  = $template->versions()->orderBy('version', 'desc')->value('version');
+        if($latestVersion) {
+            return (float)($latestVersion + ($major ? 1 : 0.1));
+        }
+        return 1.0;
+    }
+
 
 
 }

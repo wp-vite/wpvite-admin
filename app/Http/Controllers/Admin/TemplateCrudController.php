@@ -287,7 +287,8 @@ class TemplateCrudController extends CrudController
         TemplateSiteSetupJob::dispatch($template);
 
         // Redirect with success message
-        return redirect()->to($this->crud->route)->with('success', 'Template updated successfully.');
+        Alert::success('Template updated successfully');
+        return redirect()->to($this->crud->route."/{$template->template_id}/show");
     }
 
     public function handlePublish($id)

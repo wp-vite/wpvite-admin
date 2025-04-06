@@ -22,7 +22,6 @@ return new class extends Migration
 
             $table->unsignedTinyInteger('status')->default(10); // Setup Pending
             $table->unsignedTinyInteger('setup_progress')->nullable();
-            $table->timestamp('published_at')->nullable();
 
             $table->string('domain')->nullable()->unique();
             $table->string('dns_provider', 30)->nullable();
@@ -30,6 +29,10 @@ return new class extends Migration
             $table->string('root_directory')->nullable();
             $table->string('site_owner_username', 20)->nullable();
             $table->json('auth_data');
+
+            $table->timestamp('published_at')->nullable();
+            $table->float('current_version', 2);
+
             $table->timestamps();
             $table->softDeletes();
 +

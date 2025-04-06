@@ -61,6 +61,7 @@ class Template extends Model
          * }
          */
         'auth_data',
+        'current_version'
     ];
 
     /**
@@ -138,8 +139,21 @@ class Template extends Model
         return $progressList;
     }
 
+    /**
+     * Summary of server
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<HostingServer, Template>
+     */
     public function server()
     {
         return $this->belongsTo(HostingServer::class, 'server_id', 'server_id');
+    }
+
+    /**
+     * Summary of versions
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<TemplateVersion, Template>
+     */
+    public function versions()
+    {
+        return $this->hasMany(TemplateVersion::class, 'template_id', 'template_id');
     }
 }
