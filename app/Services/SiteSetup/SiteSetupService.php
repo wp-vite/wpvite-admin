@@ -137,7 +137,7 @@ abstract class SiteSetupService
 
             return $create;
         } catch (Exception $e) {
-            Log::channel('site_setup')->error("Failed to create domain for template ID {$this->siteModel->template_uid}: " . $e->getMessage());
+            Log::channel('site_setup')->error("Failed to create domain for template ID {$this->siteModel->template_id}: " . $e->getMessage());
             return [
                 'status'    => false,
                 'message'   => $e->getMessage()
@@ -199,7 +199,7 @@ abstract class SiteSetupService
             ]);
 
             if ($output->isSuccessful()) {
-                $message    = "WordPress installation successful for template ID {$this->siteModel->template_uid}: " . $output->getOutput();
+                $message    = "WordPress installation successful for template ID {$this->siteModel->template_id}: " . $output->getOutput();
                 Log::channel('site_setup')->info($message);
 
                 return [
@@ -207,11 +207,11 @@ abstract class SiteSetupService
                     'message'   => $message,
                 ];
             } else {
-                $result['message']    = "Failed to install WordPress for template ID {$this->siteModel->template_uid}: " . $output->getOutput();
+                $result['message']    = "Failed to install WordPress for template ID {$this->siteModel->template_id}: " . $output->getOutput();
                 Log::channel('site_setup')->error($result['message']);
             }
         } catch (Exception $e) {
-            $result['message']    = "Failed to install WordPress for template ID {$this->siteModel->template_uid}: " . $e->getMessage();
+            $result['message']    = "Failed to install WordPress for template ID {$this->siteModel->template_id}: " . $e->getMessage();
             Log::channel('site_setup')->error($result['message']);
         }
 
@@ -230,7 +230,7 @@ abstract class SiteSetupService
 
            return $response;
         } catch (Exception $e) {
-            Log::channel('site_setup')->error("Failed to generate SSL for the domain {$this->siteModel->domain} (template ID {$this->siteModel->template_uid}): " . $e->getMessage());
+            Log::channel('site_setup')->error("Failed to generate SSL for the domain {$this->siteModel->domain} (template ID {$this->siteModel->template_id}): " . $e->getMessage());
             return [
                 'status'    => false,
                 'message'   => $e->getMessage()

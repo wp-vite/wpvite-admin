@@ -34,7 +34,7 @@ class Virtualmin
 
         $authSource = $authorization->auth_source;
         if($authSource == 'aws_parameter_store') {
-            $parameterName  = 'hosting_servers/'. strtolower($hostingServer->server_uid);
+            $parameterName  = 'hosting_servers/'. strtolower($hostingServer->server_id);
             $auth   = (new ParameterStore)->getParameter($parameterName);
             $this->apiKey   = base64_encode($auth);
         }

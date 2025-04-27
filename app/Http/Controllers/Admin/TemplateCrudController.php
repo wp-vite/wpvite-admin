@@ -178,7 +178,6 @@ class TemplateCrudController extends CrudController
 
         // UID
         $this->crud->removeFields([
-            'template_uid',
             'status',
             'setup_progress',
             'domain',
@@ -299,9 +298,9 @@ class TemplateCrudController extends CrudController
         $result = TemplateService::publish($template);
 
         if ($result['status']) {
-            Alert::success('Template published successfully. ' . $template->template_uid)->flash();
+            Alert::success('Template published successfully. ' . $template->template_id)->flash();
         } else {
-            Alert::error(($result['message'] ?? 'Failed to publish. ') . $template->template_uid)->flash();
+            Alert::error(($result['message'] ?? 'Failed to publish. ') . $template->template_id)->flash();
         }
 
         // Redirect

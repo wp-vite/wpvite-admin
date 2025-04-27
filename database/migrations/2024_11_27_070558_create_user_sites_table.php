@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('user_sites', function (Blueprint $table) {
-            $table->id('site_id');
-            $table->string('site_uid', 15)->unique();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('server_id')->constrained('hosting_servers', 'server_id');
-            $table->foreignId('template_id')->constrained('templates', 'template_id');
+            $table->ulid('site_id')->primary();
+            $table->foreignUlid('user_id')->constrained();
+            $table->foreignUlid('server_id')->constrained('hosting_servers', 'server_id');
+            $table->foreignUlid('template_id')->constrained('templates', 'template_id');
 
             $table->unsignedTinyInteger('status')->default(10); // Setup Pending
             $table->unsignedTinyInteger('setup_progress')->nullable();

@@ -24,7 +24,7 @@ class TemplatePublisher
             $dbDump = "{$localBackupPath}/db.sql.gz";
             $uploadsZip = "{$localBackupPath}/uploads.zip";
 
-            $newVersion = TemplateService::getNewVersion($template);
+            $newVersion = TemplateService::calculateNextTemplateVersion($template);
             $s3BackupPath = TemplateService::getS3BackupPath($template, $newVersion);
 
             $authData = $template->auth_data;

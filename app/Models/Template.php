@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Template extends Model
 {
-    use CrudTrait;
-    use HasFactory;
-    use SoftDeletes;
+    use CrudTrait, HasUlids, SoftDeletes;
 
     protected $primaryKey = 'template_id';
 
     protected $fillable = [
-        'template_uid',
         'title',
         'description',
         'category_id',
@@ -74,16 +71,6 @@ class Template extends Model
         return [
             'auth_data' => AsArrayObject::class,
         ];
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($template) {
-            // Generate a unique alphanumeric ID with a prefix
-            $template->template_uid = \App\Services\Common\UidService::generate('T');
-        });
     }
 
     /**

@@ -103,9 +103,6 @@ class HostingServerCrudController extends CrudController
          * - CRUD::field('price')->type('number');
          */
 
-        // Server uid
-        $this->crud->removeField('server_uid');
-
         // Provider
         $this->crud->addField([
             'name' => 'provider',

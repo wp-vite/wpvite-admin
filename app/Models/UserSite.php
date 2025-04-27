@@ -4,18 +4,17 @@ namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserSite extends Model
 {
-    use CrudTrait;
-    use SoftDeletes;
+    use CrudTrait, HasUlids, SoftDeletes;
 
     protected $primaryKey = 'site_id';
 
     protected $fillable = [
-        'site_uid',
         'user_id',
         'template_id',
         'server_id',
@@ -71,16 +70,6 @@ class UserSite extends Model
         return [
             'auth_data' => AsArrayObject::class,
         ];
-    }
-
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::creating(function ($site) {
-            // Generate a unique alphanumeric ID with a prefix
-            $site->site_uid = \App\Services\Common\UidService::generate('S');
-        });
     }
 
     public function template()

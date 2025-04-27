@@ -3,20 +3,18 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class HostingServer extends Model
 {
-    use CrudTrait;
-    use SoftDeletes
-    ;
+    use CrudTrait, HasUlids, SoftDeletes;
+
     protected $primaryKey = 'server_id';
 
     protected $fillable = [
-        'server_uid',
         'name',
         'provider',
         'instance_type',
@@ -56,14 +54,6 @@ class HostingServer extends Model
         return [
             'authorization' => AsArrayObject::class,
         ];
-    }
-
-    protected static function booted()
-    {
-        static::creating(function ($hostingServer) {
-            // Generate a unique alphanumeric ID with a prefix
-            $hostingServer->server_uid = \App\Services\Common\UidService::generate('H');
-        });
     }
 
     public function getStatusLabelAttribute()

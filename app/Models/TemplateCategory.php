@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class TemplateCategory extends Model
 {
-    use CrudTrait;
+    use CrudTrait, HasUlids;
+
     protected $primaryKey = 'category_id';
 
     protected $fillable = [
@@ -16,13 +18,10 @@ class TemplateCategory extends Model
         'category_slug',
     ];
 
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
-        static::creating(function ($category) {
-            // Generate a unique alphanumeric ID with a prefix
-            $category->category_slug = Str::slug($category->category);
+        static::creating(function ($model) {
+            $model->category_slug = Str::slug($model->category);
         });
     }
 }

@@ -25,7 +25,6 @@ class UserSiteRequest extends FormRequest
     public function rules()
     {
         return [
-            'site_uid' => 'required|string|max:20|unique:user_sites,site_uid',
             'user_id' => 'required|exists:users,id',
             'template_id' => 'required|exists:templates,template_id',
             'server_id' => 'required|exists:hosting_servers,server_id',

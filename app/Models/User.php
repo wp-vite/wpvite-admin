@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,10 +12,9 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use CrudTrait;
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
-    use SoftDeletes;
+    use CrudTrait, HasFactory, HasUlids, Notifiable, SoftDeletes;
+
+    protected $primaryKey = 'user_id';
 
     /**
      * The attributes that are mass assignable.

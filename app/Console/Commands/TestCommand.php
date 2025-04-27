@@ -44,7 +44,7 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
-        $template   = Template::where('template_uid', 'T195BF924EAF62P0')->first();
+        $template   = Template::where('template_id', 'T195BF924EAF62P0')->first();
 
         $templatePublisher   = resolve(TemplatePublisherService::class);
         dd($templatePublisher->publish($template));

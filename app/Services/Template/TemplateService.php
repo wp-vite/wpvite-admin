@@ -44,16 +44,16 @@ class TemplateService
      */
     public static function getS3BackupPath(Template $template, string $backupVersion): string
     {
-        return "s3://". Config::get('filesystems.disks.s3_admin.bucket') ."/templates/{$template->template_uid}/{$backupVersion}";
+        return "s3://". Config::get('filesystems.disks.s3_admin.bucket') ."/templates/{$template->template_id}/{$backupVersion}";
     }
 
     /**
-     * Summary of getNewVersion
+     * Summary of calculateNextTemplateVersion
      * @param \App\Models\Template $template
      * @param bool $major
      * @return float
      */
-    public static function getNewVersion(Template $template, bool $major = false): float
+    public static function calculateNextTemplateVersion(Template $template, bool $major = false): float
     {
         $latestVersion  = $template->versions()->orderBy('version', 'desc')->value('version');
         if($latestVersion) {

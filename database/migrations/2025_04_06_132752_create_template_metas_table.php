@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('template_metas', function (Blueprint $table) {
-            $table->id('meta_id');
-            $table->foreignId('template_id')->constrained('templates', 'template_id');
+            $table->ulid('meta_id')->primary();
+            $table->foreignUlid('template_id')->constrained('templates', 'template_id');
             $table->string('meta_key', 50);
             $table->string('meta_value');
             $table->timestamps();
