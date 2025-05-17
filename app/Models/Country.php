@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Country extends Model
 {
     use CrudTrait;
+
+    protected $connection = 'wpvite_user';
     protected $primaryKey = 'country_id';
 
     protected $fillable = [

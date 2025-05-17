@@ -18,15 +18,16 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 100);
-            $table->enum('role', ['admin', 'user'])->default('user')->index(); // User role
-            $table->unsignedTinyInteger('status')->default(1)->index(); // 0 => Inactive, 1 => Active, 2 => Suspended
-            $table->unsignedBigInteger('mobile')->unique();
+            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 2 => Suspended
+            $table->unsignedBigInteger('mobile_number');
             $table->unsignedSmallInteger('isd_code');
-            $table->foreignId('country_id')->constrained('countries', 'country_id');
+            $table->unsignedSmallInteger('country_id')->index();
             $table->rememberToken();
 
             $table->timestamps();
             $table->softDeletes();
+
+            $table->unique(['mobile_number', 'isd_code']);
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
