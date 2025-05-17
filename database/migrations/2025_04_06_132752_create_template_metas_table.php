@@ -14,11 +14,9 @@ return new class extends Migration
         Schema::create('template_metas', function (Blueprint $table) {
             $table->ulid('meta_id')->primary();
             $table->foreignUlid('template_id')->constrained('templates', 'template_id');
-            $table->string('meta_key', 50);
+            $table->string('meta_key', 50)->index();
             $table->string('meta_value');
             $table->timestamps();
-
-            $table->index('meta_key');
         });
     }
 

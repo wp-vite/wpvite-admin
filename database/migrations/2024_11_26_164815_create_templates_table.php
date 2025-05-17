@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignUlid('category_id')->constrained('template_categories', 'category_id');
             $table->foreignUlid('server_id')->constrained('hosting_servers', 'server_id');
 
-            $table->unsignedTinyInteger('status')->default(10); // Setup Pending
+            $table->unsignedTinyInteger('status')->default(10)->index(); // Setup Pending
             $table->unsignedTinyInteger('setup_progress')->nullable();
 
             $table->string('domain')->nullable()->unique();
@@ -27,16 +27,13 @@ return new class extends Migration
             $table->string('dns_record_id', 50)->nullable()->unique();
             $table->string('root_directory')->nullable();
             $table->string('site_owner_username', 20)->nullable();
-            $table->json('auth_data');
+            $table->json('auth_data')->nullable();
 
-            $table->timestamp('published_at')->nullable();
-            $table->float('current_version', 2);
+            $table->timestamp('published_at')->nullable()->index();
+            $table->float('current_version', 2)->nullable();
 
             $table->timestamps();
             $table->softDeletes();
-
-            $table->index('status');
-            $table->index('published_at');
         });
 
     }

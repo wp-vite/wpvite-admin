@@ -18,17 +18,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 100);
-            $table->enum('role', ['admin', 'user'])->default('user'); // User role
-            $table->unsignedTinyInteger('status')->default(1); // 0 => Inactive, 1 => Active, 2 => Suspended
+            $table->enum('role', ['admin', 'user'])->default('user')->index(); // User role
+            $table->unsignedTinyInteger('status')->default(1)->index(); // 0 => Inactive, 1 => Active, 2 => Suspended
             $table->unsignedBigInteger('mobile')->unique();
             $table->unsignedSmallInteger('isd_code');
             $table->foreignId('country_id')->constrained('countries', 'country_id');
             $table->rememberToken();
+
             $table->timestamps();
             $table->softDeletes();
-
-            $table->index('role');
-            $table->index('status');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
@@ -38,7 +36,7 @@ return new class extends Migration
         });
 
         Schema::create('sessions', function (Blueprint $table) {
-            $table->ulid('session_id')->primary();
+            $table->string('id')->primary();
             $table->foreignUlid('user_id')->nullable()->constrained('users', 'user_id')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();

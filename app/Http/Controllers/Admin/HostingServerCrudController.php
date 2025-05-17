@@ -46,7 +46,7 @@ class HostingServerCrudController extends CrudController
          * - CRUD::column('price')->type('number');
          */
 
-        $this->crud->removeColumns(['status', 'instance_id', 'virtualmin_url']);
+        $this->crud->removeColumns(['status', 'instance_id', 'virtualmin_url', 'authorization']);
 
         $tinyIntFields  = ['max_sites', 'cpu', 'ram', 'disk_size'];
         foreach($tinyIntFields as $field) {
@@ -72,7 +72,7 @@ class HostingServerCrudController extends CrudController
         // automatically add the columns
         $this->autoSetupShowOperation();
 
-        $this->crud->removeColumns(['status']);
+        $this->crud->removeColumns(['status', 'authorization']);
 
         $tinyIntFields  = ['max_sites', 'cpu', 'ram', 'disk_size'];
         foreach($tinyIntFields as $field) {
@@ -85,6 +85,12 @@ class HostingServerCrudController extends CrudController
             'type' => 'text', // Display the resolved label as plain text
         ]);
         $this->crud->column('status_label')->after('name');
+
+        $this->crud->addColumn([
+            'name'  => 'authorization',
+            'type'  => 'json_table',
+            'label' => 'Authorization',
+        ]);
     }
 
     /**
@@ -176,7 +182,7 @@ class HostingServerCrudController extends CrudController
         $this->crud->addField([
             'name' => 'authorization',
             'label' => 'Authorization (JSON only)',
-            'type' => 'textarea',
+            'type' => 'json_editor',
             'attributes' => [
                 // 'placeholder'  => "{\"key1\":\"value1\", \"key2\":\"value2\"}",
                 'placeholder'  => json_encode(["key1" => "value1", "key2" => "value2"], JSON_PRETTY_PRINT),

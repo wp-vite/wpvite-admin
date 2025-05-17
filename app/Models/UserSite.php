@@ -72,6 +72,18 @@ class UserSite extends Model
         ];
     }
 
+    public function setAuthDataAttribute($value)
+    {
+        // If value is a JSON string, decode it
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $this->attributes['auth_data'] = $decoded ? json_encode($decoded) : json_encode([]);
+        } else {
+            // If it's already an array or object, encode it as-is
+            $this->attributes['auth_data'] = json_encode($value);
+        }
+    }
+
     public function template()
     {
         return $this->belongsTo(Template::class, 'template_id', 'template_id');
@@ -84,6 +96,6 @@ class UserSite extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

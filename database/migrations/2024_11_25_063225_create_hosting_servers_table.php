@@ -26,6 +26,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('status')->default(2); // 0 => Inactive, 1 => Active, 2 => Maintenance
             $table->string('virtualmin_url', 255);
             $table->json('authorization');
+
             $table->timestamps();
             $table->softDeletes();
         });

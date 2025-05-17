@@ -41,7 +41,7 @@ class HostingServer extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        'authorization',
+        //
     ];
 
     /**
@@ -55,6 +55,25 @@ class HostingServer extends Model
             'authorization' => AsArrayObject::class,
         ];
     }
+
+    public function setAuthorizationAttribute($value)
+    {
+        // If value is a JSON string, decode it
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $this->attributes['authorization'] = $decoded ? json_encode($decoded) : json_encode([]);
+        } else {
+            // If it's already an array or object, encode it as-is
+            $this->attributes['authorization'] = json_encode($value);
+        }
+    }
+
+    // public function getAuthorizationAttribute($value)
+    // {
+    //     $decoded = json_decode($value, true);
+    //     return json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    // }
+
 
     public function getStatusLabelAttribute()
     {

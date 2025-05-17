@@ -17,9 +17,12 @@ use App\Services\Virtualmin\VirtualminSiteManager;
 use Illuminate\Console\Command;
 use Faker\Factory as Faker;
 use App\Services\Ssh\SshService;
+use App\Services\Template\TemplateService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class TestCommand extends Command
 {
@@ -44,7 +47,10 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
-        $template   = Template::where('template_id', 'T195BF924EAF62P0')->first();
+        $template   = Template::where('template_id', '01JTZZQXBRF0C7YCV4C975NYKV')->first();
+
+        $templateSetup  = TemplateService::setup($template);
+        dd($templateSetup->run());
 
         $templatePublisher   = resolve(TemplatePublisherService::class);
         dd($templatePublisher->publish($template));

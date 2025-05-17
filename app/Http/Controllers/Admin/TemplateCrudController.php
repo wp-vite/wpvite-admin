@@ -9,7 +9,6 @@ use App\Models\HostingServer;
 use App\Models\Template;
 use App\Models\TemplateCategory;
 use App\Repositories\TemplateRepository;
-use App\Services\SiteSetup\TemplatePublisherService;
 use App\Services\Template\TemplateService;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
@@ -68,6 +67,7 @@ class TemplateCrudController extends CrudController
             'dns_provider',
             'dns_record_id',
             'auth_data',
+            'published_at',
         ]);
 
         // Status
@@ -117,7 +117,7 @@ class TemplateCrudController extends CrudController
             'name' => 'setup_progress',
             'type'      => 'Text',
             'value' => function ($entry) {
-                return Template::setupProgress($entry->setup_progress);
+                return Template::setupProgress($entry->setup_progress, '-');
             },
         ])->afterColumn('status');
 
@@ -139,11 +139,14 @@ class TemplateCrudController extends CrudController
 
                 // Convert associative array to key-value format
                 $formattedData = <<<HER
-                    <table>
-                        <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                        </tr>
+                    <table class="table table-bordered table-sm mb-0" style="font-size: 90%;">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 40%">Key</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                 HER;
 
                 foreach ($authData as $key => $val) {
@@ -153,7 +156,7 @@ class TemplateCrudController extends CrudController
                     $formattedData  .= "<tr><td>{$key}</td><td>{$val}</td></tr>";
                 }
 
-                $formattedData  .= "</table>";
+                $formattedData  .= "</tbody></table>";
 
                 return $formattedData;
             },
@@ -186,6 +189,8 @@ class TemplateCrudController extends CrudController
             'dns_provider',
             'dns_record_id',
             'auth_data',
+            'published_at',
+            'current_version',
         ]);
 
         // Category
