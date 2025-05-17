@@ -56,17 +56,22 @@ class ParameterStore extends AwsBase
      */
     public function getParameter(string $name, bool $decrypt = true): ?string
     {
-        try {
-            $result = $this->client->getParameter([
-                'Name'           => $this->parameterPrefix . $name,
-                'WithDecryption' => $decrypt,
-            ]);
+        $result = $this->client->getParameter([
+            'Name'           => $this->parameterPrefix . $name,
+            'WithDecryption' => $decrypt,
+        ]);
 
-            return $result['Parameter']['Value'] ?? null;
-        } catch (Exception $e) {
-            logger()->error("Failed to retrieve parameter {$name}: " . $e->getMessage());
-            return null;
+        if(isset($result['Parameter']['Value'])) {
+            return $result['Parameter']['Value'];
         }
+
+        $errorMsg   = "Failed to retrieve parameter {$name}";
+        if(isset($result['message'])) {
+            $errorMsg .= ': '. $result['message'];
+        }
+
+        logger()->error($errorMsg);
+        throw new Exception($errorMsg);
     }
 
     /**

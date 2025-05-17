@@ -47,7 +47,7 @@ class TestCommand extends Command
     {
         $arg1   = $this->argument('arg1');
 
-        $template   = Template::where('template_id', '01JTZZQXBRF0C7YCV4C975NYKV')->first();
+        $template   = Template::where('template_id', '01jvf9jqrf41rd2cb483xznjx7')->first();
 
         $templateSetup  = TemplateService::setup($template);
         dd($templateSetup->run());
