@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('template_versions', function (Blueprint $table) {
-            $table->ulid('version_id')->primary();
+            $table->id('version_id')->primary();
             $table->foreignUlid('template_id')->constrained('templates', 'template_id');
             $table->float('version', 2);
             $table->timestamps();

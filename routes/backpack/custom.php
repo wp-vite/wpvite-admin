@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\TemplatePublishController;
 use Illuminate\Support\Facades\Route;
 
 // --------------------------
@@ -21,7 +22,13 @@ Route::group([
     Route::crud('country', 'CountryCrudController');
     Route::crud('hosting-server', 'HostingServerCrudController');
     Route::crud('template-category', 'TemplateCategoryCrudController');
+    Route::crud('template-tag', 'TemplateTagCrudController');
     Route::crud('user-site', 'UserSiteCrudController');
+
+    // Template
+    Route::get('template/{template}/publish', [TemplatePublishController::class, 'getPublish'])->name('template.getPublish');
+    Route::post('template/{template}/publish', [TemplatePublishController::class, 'publish'])->name('template.publish');
+
 }); // this should be the absolute last line of this file
 
 /**

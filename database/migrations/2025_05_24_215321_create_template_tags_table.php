@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('template_metas', function (Blueprint $table) {
-            $table->id('meta_id')->primary();
-            $table->foreignUlid('template_id')->constrained('templates', 'template_id');
-            $table->string('meta_key', 50)->index();
-            $table->string('meta_value');
+        Schema::create('template_tags', function (Blueprint $table) {
+            $table->id('tag_id')->primary();
+            $table->string('tag')->unique();
+            $table->string('slug')->unique();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('template_metas');
+        Schema::dropIfExists('template_tags');
     }
 };

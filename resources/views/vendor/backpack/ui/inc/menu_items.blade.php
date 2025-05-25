@@ -6,7 +6,8 @@
 
 <x-backpack::menu-dropdown title="Templates" icon="la la-folder">
     <x-backpack::menu-dropdown-item title="Templates" icon="la la-file-alt" :link="backpack_url('template')" />
-    <x-backpack::menu-dropdown-item title="Template categories" icon="la la-list" :link="backpack_url('template-category')" />
+    <x-backpack::menu-dropdown-item title="Categories" icon="la la-list" :link="backpack_url('template-category')" />
+    <x-backpack::menu-dropdown-item title="Tags" icon="la la-list" :link="backpack_url('template-tag')" />
 </x-backpack::menu-dropdown>
 <x-backpack::menu-item title="Hosting servers" icon="la la-server" :link="backpack_url('hosting-server')" />
 {{-- <x-backpack::menu-item title="Countries" icon="la la-globe" :link="backpack_url('country')" /> --}}

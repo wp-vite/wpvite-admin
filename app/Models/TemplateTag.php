@@ -6,26 +6,27 @@ use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class TemplateCategory extends Model
+class TemplateTag extends Model
 {
     use CrudTrait;
 
-    protected $primaryKey = 'category_id';
+    protected $primaryKey = 'tag_id';
 
     protected $fillable = [
-        'category',
-        'category_slug',
+        'tag',
+        'slug',
     ];
 
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->category_slug = Str::slug($model->category);
+            $model->slug = Str::slug($model->tag);
         });
     }
 
     public function templates()
     {
-        return $this->hasMany(Template::class, 'category_id', 'category_id');
+        return $this->belongsToMany(Template::class, 'template_template_tag')
+            ->using(TemplateTemplateTag::class);
     }
 }

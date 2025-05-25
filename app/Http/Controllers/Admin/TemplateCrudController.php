@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\Operations\PublishOperation;
+// use App\Http\Controllers\Admin\Operations\PublishOperation;
 use App\Http\Requests\TemplateRequest;
 use App\Jobs\TemplateSiteSetupJob;
 use App\Models\HostingServer;
@@ -27,7 +27,7 @@ class TemplateCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
-    use PublishOperation;
+    // use PublishOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -59,6 +59,8 @@ class TemplateCrudController extends CrudController
          */
 
         $this->crud->removeColumns([
+            'server_id',
+            'category_id',
             'status',
             'setup_progress',
             'domain',
@@ -69,6 +71,24 @@ class TemplateCrudController extends CrudController
             'auth_data',
             'published_at',
         ]);
+
+        // Category
+        $this->crud->column([
+            'name' => 'category_id',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return $entry->category_title;
+            },
+        ])->afterColumn('description');
+
+        // Server
+        $this->crud->column([
+            'name' => 'server_id',
+            'type'      => 'Text',
+            'value' => function ($entry) {
+                return $entry->server_name;
+            },
+        ])->afterColumn('category_id');
 
         // Status
         $this->crud->column([
@@ -94,6 +114,8 @@ class TemplateCrudController extends CrudController
      */
     protected function setupShowOperation()
     {
+        $this->crud->addButtonFromView('line', 'publish-template', 'crud::buttons.publish-template', 'beginning');
+
         // automatically add the columns
         $this->autoSetupShowOperation();
 
@@ -293,22 +315,5 @@ class TemplateCrudController extends CrudController
         // Redirect with success message
         Alert::success('Template updated successfully');
         return redirect()->to($this->crud->route."/{$template->template_id}/show");
-    }
-
-    public function handlePublish($id)
-    {
-        $template = Template::findOrFail($id);
-        // $template  = $this->crud->getCurrentEntry();
-
-        $result = TemplateService::publish($template);
-
-        if ($result['status']) {
-            Alert::success('Template published successfully. ' . $template->template_id)->flash();
-        } else {
-            Alert::error(($result['message'] ?? 'Failed to publish. ') . $template->template_id)->flash();
-        }
-
-        // Redirect
-        return redirect()->to($this->crud->route."/{$id}/show");
     }
 }

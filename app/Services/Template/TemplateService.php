@@ -31,9 +31,9 @@ class TemplateService
      * @param \App\Models\Template $template
      * @return array{message: string, status: bool}
      */
-    public static function publish(Template $template): array
+    public static function publish(Template $template, array $inputs): array
     {
-        return resolve(TemplatePublisher::class)->publish($template);
+        return resolve(TemplatePublisher::class)->publish($template, $inputs);
     }
 
     /**

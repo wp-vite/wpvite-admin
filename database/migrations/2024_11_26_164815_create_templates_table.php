@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title', 100);
             $table->text('description')->nullable();
 
-            $table->foreignUlid('category_id')->constrained('template_categories', 'category_id');
+            $table->foreignId('category_id')->constrained('template_categories', 'category_id');
             $table->foreignUlid('server_id')->constrained('hosting_servers', 'server_id');
 
             $table->unsignedTinyInteger('status')->default(10)->index(); // Setup Pending

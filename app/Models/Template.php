@@ -106,7 +106,7 @@ class Template extends Model
      * @param int|null $progress
      * @return string|string[]
      */
-    public static function setupProgress(?int $progress = null, string $default = null)
+    public static function setupProgress(?int $progress = null)
     {
         $progressList = [
             1 => 'Setup Initialized',
@@ -137,6 +137,50 @@ class Template extends Model
             // If it's already an array or object, encode it as-is
             $this->attributes['auth_data'] = json_encode($value);
         }
+    }
+
+    /**
+     * Summary of getCategoryTitleAttribute
+     */
+    public function getCategoryTitleAttribute()
+    {
+        return $this->category->category;
+    }
+
+    /**
+     * Summary of getServerNameAttribute
+     */
+    public function getServerNameAttribute()
+    {
+        return $this->server->name;
+    }
+
+    /**
+     * Summary of category
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<TemplateCategory, Template>
+     */
+    public function category()
+    {
+        return $this->belongsTo(TemplateCategory::class, 'category_id', 'category_id');
+    }
+
+    /**
+     * Summary of tags
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<TemplateTag, Template, \Illuminate\Database\Eloquent\Relations\Pivot>
+     */
+    public function tags()
+    {
+        return $this->belongsToMany(TemplateTag::class, 'template_template_tag')
+            ->using(TemplateTemplateTag::class);
+    }
+
+    /**
+     * Summary of thumbnails
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<TemplatePreview, Template>
+     */
+    public function previews()
+    {
+        return $this->hasMany(TemplatePreview::class, 'template_id', 'template_id');
     }
 
     /**
