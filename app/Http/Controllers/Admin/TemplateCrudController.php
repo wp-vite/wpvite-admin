@@ -136,7 +136,21 @@ class TemplateCrudController extends CrudController
      */
     protected function setupShowOperation()
     {
-        $this->crud->addButtonFromView('line', 'publish-template', 'crud::buttons.publish-template', 'beginning');
+        $this->crud->set('show.setFromDb', false);
+        $this->crud->set('show.contentClass', 'col-md-12');
+        $this->crud->set('show.view', 'vendor.backpack.crud.show_template');
+
+        // Add publish button if user has access
+        if ($this->crud->hasAccess('publish')) {
+            $this->crud->button('publish', 'top', function ($crud, $entry) {
+                if (!$entry->is_published) {
+                    return '<a href="'.route('template.getPublish', $entry->getKey()).'" class="btn btn-sm btn-success">
+                        <i class="la la-upload"></i> Publish
+                    </a>';
+                }
+                return '';
+            });
+        }
 
         // automatically add the columns
         $this->autoSetupShowOperation();
@@ -348,7 +362,7 @@ class TemplateCrudController extends CrudController
         // Step 1: Validate the form input
         $data = $request->all();
 
-        $template  = $this->crud->getCurrentEntry();
+        $template = $this->crud->getCurrentEntry();
 
         // setup_progress
         if(empty($data['setup_progress'])) {
@@ -360,10 +374,15 @@ class TemplateCrudController extends CrudController
             $data['domain'] = TemplateRepository::makeTemplateDomain($template);
         }
 
-        // $request->merge($data);
+        // Handle tags separately
+        $tags = $data['tags'] ?? [];
+        unset($data['tags']);
 
-        // Call Backpack's default update logic
+        // Update the template
         $template->update($data);
+
+        // Sync the tags
+        $template->tags()->sync($tags);
 
         // Dispatch the TemplateSiteSetupJob
         TemplateSiteSetupJob::dispatch($template);

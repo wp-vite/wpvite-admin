@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class TemplateTemplateTag extends Model
+class TemplateTemplateTag extends Pivot
 {
     protected $table = 'template_template_tag';
     protected $primaryKey = 'template_tag_id';
