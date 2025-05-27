@@ -102,6 +102,25 @@ class Template extends Model
     }
 
     /**
+     * Summary of statusBadge
+     * @param mixed $status
+     * @param string $classes = "fs-4"
+     * @return string
+     */
+    public static function statusBadge(?int $status = null, string $classes = 'fs-5')
+    {
+        $badgeColors = [
+            0 => 'bg-warning text-dark',
+            1 => 'bg-success',
+            12 => 'bg-danger',
+        ];
+
+        $badgeColor = $badgeColors[$status] ?? 'bg-secondary';
+        $statusTxt  = self::status($status);
+        return "<span class=\"badge rounded-pill {$badgeColor} {$classes}\">{$statusTxt}</span>";
+    }
+
+    /**
      * setupProgress
      * @param int|null $progress
      * @return string|string[]
@@ -125,6 +144,28 @@ class Template extends Model
         }
 
         return $progressList;
+    }
+
+    /**
+     * Summary of setupProgressBadge
+     * @param mixed $progress
+     * @param string $classes
+     * @return string
+     */
+    public static function setupProgressBadge(?int $progress = null, string $classes = 'fs-5')
+    {
+        if(empty($progress)) {
+            return $progress;
+        }
+
+        $badgeColors = [
+            1 => 'bg-light text-dark',
+            100 => 'bg-primary',
+        ];
+
+        $badgeColor = $badgeColors[$progress] ?? 'bg-secondary';
+        $progressTxt  = self::setupProgress($progress);
+        return "<span class=\"badge rounded-pill {$badgeColor} {$classes}\">{$progressTxt}</span>";
     }
 
     public function setAuthDataAttribute($value)
@@ -170,7 +211,7 @@ class Template extends Model
      */
     public function tags()
     {
-        return $this->belongsToMany(TemplateTag::class, 'template_template_tag')
+        return $this->belongsToMany(TemplateTag::class, 'template_template_tag', 'template_id', 'tag_id')
             ->using(TemplateTemplateTag::class);
     }
 

@@ -30,6 +30,8 @@ class TemplateRequest extends FormRequest
             'category_id' => 'required|exists:template_categories,category_id',
             'server_id' => 'required|exists:hosting_servers,server_id',
             'status' => 'required|integer|in:0,1,2', // Must be one of the allowed statuses
+            'tags' => 'nullable|array',
+            'tags.*' => 'exists:template_tags,tag_id',
         ];
     }
 

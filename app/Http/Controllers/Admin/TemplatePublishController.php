@@ -30,6 +30,7 @@ class TemplatePublishController extends CrudController
     public function publish(Request $request, Template $template)
     {
         $validated = $request->validate([
+            'new_version' => 'required|float|min:1',
             'previews' => 'required|array|min:1',
             'previews.*.title' => 'required|string|max:255',
             'previews.*.screenshot' => 'required|image|max:2048',

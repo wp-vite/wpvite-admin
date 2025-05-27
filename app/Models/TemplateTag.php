@@ -24,9 +24,20 @@ class TemplateTag extends Model
         });
     }
 
+    /**
+     * Set the tag attribute and capitalize each word.
+     *
+     * @param string $value
+     * @return void
+     */
+    public function setTagAttribute($value)
+    {
+        $this->attributes['tag'] = ucwords(strtolower($value));
+    }
+
     public function templates()
     {
-        return $this->belongsToMany(Template::class, 'template_template_tag')
+        return $this->belongsToMany(Template::class, 'template_template_tag', 'tag_id', 'template_id')
             ->using(TemplateTemplateTag::class);
     }
 }

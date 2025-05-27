@@ -15,6 +15,6 @@ class TemplateRepository
 
     public static function makeTemplateDomain(Template $template)
     {
-        return 'template'. $template->template_id .'.'. Config::get('wpvite.root_domain');
+        return $template->template_id .'.'. Config::get('wpvite.root_domain');
     }
 }

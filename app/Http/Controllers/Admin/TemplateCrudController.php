@@ -70,6 +70,7 @@ class TemplateCrudController extends CrudController
             'dns_record_id',
             'auth_data',
             'published_at',
+            'current_version',
         ]);
 
         // Category
@@ -93,20 +94,41 @@ class TemplateCrudController extends CrudController
         // Status
         $this->crud->column([
             'name' => 'status',
-            'type'      => 'Text',
+            'type'      => 'custom_html',
             'value' => function ($entry) {
-                return $entry->status;
+                return Template::statusBadge($entry->status);
             },
         ]);
 
         // setup_progress
         $this->crud->column([
             'name' => 'setup_progress',
-            'type'      => 'Text',
+            'type'      => 'custom_html',
             'value' => function ($entry) {
-                return $entry->setup_progress;
+                if($entry->status === 1 && $entry->published_at) {
+                    return '<span class="badge rounded-pill bg-success fs-5">Live</span>';
+                } else {
+                    return Template::setupProgressBadge($entry->setup_progress);
+                }
             },
         ]);
+
+        // Tags
+        $this->crud->addColumn([
+            'name' => 'tags',
+            'type' => 'custom_html',
+            'value' => function ($entry) {
+                $tags = $entry->tags->pluck('tag')->toArray();
+                if (empty($tags)) {
+                    return '-';
+                }
+                $html = '';
+                foreach ($tags as $tag) {
+                    $html .= '<span class="badge bg-secondary me-1">' . e($tag) . '</span>';
+                }
+                return $html;
+            },
+        ])->afterColumn('setup_progress');
     }
 
     /**
@@ -128,18 +150,22 @@ class TemplateCrudController extends CrudController
         // Status
         $this->crud->addColumn([
             'name' => 'status',
-            'type'      => 'Text',
+            'type'      => 'custom_html',
             'value' => function ($entry) {
-                return Template::status($entry->status);
+                return Template::statusBadge($entry->status);
             },
-        ])->afterColumn('category_id');
+        ])->afterColumn('domain');
 
         // setup_progress
         $this->crud->addColumn([
             'name' => 'setup_progress',
-            'type'      => 'Text',
+            'type'      => 'custom_html',
             'value' => function ($entry) {
-                return Template::setupProgress($entry->setup_progress, '-');
+                if($entry->status === 1 && $entry->published_at) {
+                    return '<span class="badge rounded-pill bg-success fs-5">Live</span>';
+                } else {
+                    return Template::setupProgressBadge($entry->setup_progress);
+                }
             },
         ])->afterColumn('status');
 
@@ -183,6 +209,23 @@ class TemplateCrudController extends CrudController
                 return $formattedData;
             },
         ])->beforeColumn('created_at');
+
+        // Tags
+        $this->crud->addColumn([
+            'name' => 'tags',
+            'type' => 'custom_html',
+            'value' => function ($entry) {
+                $tags = $entry->tags->pluck('tag')->toArray();
+                if (empty($tags)) {
+                    return '-';
+                }
+                $html = '';
+                foreach ($tags as $tag) {
+                    $html .= '<span class="badge bg-secondary me-1">' . e($tag) . '</span>';
+                }
+                return $html;
+            },
+        ]);
     }
 
     /**
@@ -232,6 +275,19 @@ class TemplateCrudController extends CrudController
             'options' => HostingServer::orderBy('name')->pluck('name', 'server_id')->toArray(),
             'wrapperAttributes' => [
                 'class' => 'form-group col-md-6',
+            ],
+        ]);
+
+        // Tags
+        $this->crud->addField([
+            'name' => 'tags',
+            'type' => 'select_multiple',
+            'entity' => 'tags',
+            'attribute' => 'tag',
+            'model' => 'App\Models\TemplateTag',
+            'pivot' => true,
+            'wrapperAttributes' => [
+                'class' => 'form-group col-md-12',
             ],
         ]);
     }
@@ -306,7 +362,7 @@ class TemplateCrudController extends CrudController
 
         // $request->merge($data);
 
-        // Call Backpack’s default update logic
+        // Call Backpack's default update logic
         $template->update($data);
 
         // Dispatch the TemplateSiteSetupJob

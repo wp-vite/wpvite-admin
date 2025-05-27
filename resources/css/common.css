@@ -35,3 +35,7 @@
 .navbar-brand img.wpvite_logo {
     width: 180px;
 }
+.auth-logo-container img.wpvite_logo {
+    width: 230px;
+    margin: 0 auto;
+}

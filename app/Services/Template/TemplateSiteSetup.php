@@ -28,6 +28,7 @@ class TemplateSiteSetup extends SiteSetupService
             }
 
             // Initialize setup
+            $this->statusUpdate(11); // Setup in progress
             if(empty($this->setupProgress) || $this->setupProgress == 1) {
                 $this->setupProgressUpdate(2);  // DNS Setup Pending
             }

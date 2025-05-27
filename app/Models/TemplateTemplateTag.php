@@ -14,4 +14,14 @@ class TemplateTemplateTag extends Model
         'template_id',
         'tag_id',
     ];
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class, 'template_id', 'template_id');
+    }
+
+    public function tag()
+    {
+        return $this->belongsTo(TemplateTag::class, 'tag_id', 'tag_id');
+    }
 }
